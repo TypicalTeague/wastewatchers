@@ -50,3 +50,5 @@ __pycache__/
 .streamlit/secrets.toml
 
 *.egg-info/
+
+.wastewatchers.sqlite3

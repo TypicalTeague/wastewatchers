@@ -1,0 +1,264 @@
+openapi: 3.1.0
+info:
+  title: WasteWatchers Demo Operations API
+  version: 0.1.0
+  description: Additive API contract for hackathon demo scenario, simulation, dashboard view, and manager actions.
+paths:
+  /demo/scenario/load:
+    post:
+      summary: Load deterministic four-shipment demo scenario
+      operationId: loadDemoScenario
+      responses:
+        "200":
+          description: Loaded demo dashboard state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/scenario/reset:
+    post:
+      summary: Reset demo state and return to empty dashboard state
+      operationId: resetDemoScenario
+      responses:
+        "200":
+          description: Reset state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/dashboard:
+    get:
+      summary: Get logistics-control-center dashboard view
+      operationId: getDemoDashboard
+      responses:
+        "200":
+          description: Dashboard state, including empty state when no scenario is loaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/simulation/start:
+    post:
+      summary: Start live simulation with configurable update interval
+      operationId: startDemoSimulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulationConfig"
+      responses:
+        "200":
+          description: Simulation running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/simulation/pause:
+    post:
+      summary: Pause live simulation
+      operationId: pauseDemoSimulation
+      responses:
+        "200":
+          description: Simulation paused
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/simulation/step:
+    post:
+      summary: Advance simulation by one deterministic step
+      operationId: advanceDemoSimulationStep
+      responses:
+        "200":
+          description: One step applied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/controls/{shipment_id}/{control}:
+    post:
+      summary: Apply presenter control to a shipment
+      operationId: applyDemoControl
+      parameters:
+        - name: shipment_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: control
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - cooling_failure
+              - temperature_spike
+              - restore_cooling
+              - telemetry_outage
+      responses:
+        "200":
+          description: Control applied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/shipments/{shipment_id}/decision:
+    post:
+      summary: Apply manager decision action
+      operationId: applyDemoManagerDecision
+      parameters:
+        - name: shipment_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManagerDecisionRequest"
+      responses:
+        "200":
+          description: Decision applied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+components:
+  schemas:
+    SimulationConfig:
+      type: object
+      required:
+        - interval_seconds
+      properties:
+        interval_seconds:
+          type: integer
+          minimum: 1
+          maximum: 60
+    ManagerDecisionRequest:
+      type: object
+      required:
+        - action
+        - actor_label
+      properties:
+        action:
+          type: string
+          enum:
+            - approve_reroute
+            - send_manual_review
+            - reject_shipment
+        actor_label:
+          type: string
+          minLength: 1
+    DemoDashboardState:
+      type: object
+      required:
+        - scenario_status
+        - empty_state
+        - metrics
+        - shipments
+        - message
+      properties:
+        scenario_status:
+          type: string
+          enum:
+            - empty
+            - loaded
+            - running
+            - paused
+            - reset
+        empty_state:
+          type: boolean
+        message:
+          type: string
+        metrics:
+          $ref: "#/components/schemas/DemoMetrics"
+        shipments:
+          type: array
+          items:
+            $ref: "#/components/schemas/DemoShipmentState"
+    DemoMetrics:
+      type: object
+      required:
+        - active_shipments
+        - at_risk_shipments
+        - critical_shipments
+        - estimated_value_protected_usd
+      properties:
+        active_shipments:
+          type: integer
+          minimum: 0
+        at_risk_shipments:
+          type: integer
+          minimum: 0
+        critical_shipments:
+          type: integer
+          minimum: 0
+        estimated_value_protected_usd:
+          type: number
+          minimum: 0
+    DemoShipmentState:
+      type: object
+      required:
+        - shipment_id
+        - trailer_id
+        - truck_id
+        - crop
+        - risk_level
+        - pallet_color
+        - remaining_shelf_life_hours
+        - remaining_shelf_life_percent
+        - temperature_c
+        - safe_temp_min_c
+        - safe_temp_max_c
+        - temperature_history
+        - estimated_value_usd
+        - recommended_destination
+        - time_remaining_to_act_minutes
+      properties:
+        shipment_id:
+          type: string
+        trailer_id:
+          type: string
+        truck_id:
+          type: string
+        crop:
+          type: string
+        risk_level:
+          type: string
+        pallet_color:
+          type: string
+          enum:
+            - green
+            - yellow
+            - red
+            - gray
+        remaining_shelf_life_hours:
+          type: number
+          minimum: 0
+        remaining_shelf_life_percent:
+          type: number
+          minimum: 0
+          maximum: 100
+        temperature_c:
+          type: number
+        safe_temp_min_c:
+          type: number
+        safe_temp_max_c:
+          type: number
+        temperature_history:
+          type: array
+          items:
+            type: object
+        estimated_value_usd:
+          type: number
+          minimum: 0
+        recommended_destination:
+          type:
+            - string
+            - "null"
+        time_remaining_to_act_minutes:
+          type: integer
+
