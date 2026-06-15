@@ -1,0 +1,344 @@
+openapi: 3.1.0
+info:
+  title: WasteWatchers Salvage Rerouting API
+  version: 0.1.0
+  description: Contract for telemetry ingestion, shipment risk dashboard data, and salvage reroute approvals.
+paths:
+  /telemetry/readings:
+    post:
+      summary: Ingest a trailer telemetry reading
+      operationId: ingestTelemetryReading
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelemetryReadingCreate"
+      responses:
+        "202":
+          description: Reading accepted and shipment assessment updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelemetryIngestResult"
+        "422":
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /shipments/at-risk:
+    get:
+      summary: List shipments requiring logistics review
+      operationId: listAtRiskShipments
+      parameters:
+        - name: include_watch
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          description: Dashboard-ready shipment records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DashboardShipment"
+  /shipments/{shipment_id}:
+    get:
+      summary: Get shipment risk and recommendation details
+      operationId: getShipmentDetail
+      parameters:
+        - name: shipment_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shipment detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardShipmentDetail"
+        "404":
+          description: Shipment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /recommendations/{recommendation_id}/approve:
+    post:
+      summary: Approve a salvage reroute recommendation
+      operationId: approveRerouteRecommendation
+      parameters:
+        - name: recommendation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalCreate"
+      responses:
+        "200":
+          description: Reroute approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalRecord"
+        "409":
+          description: Recommendation cannot be approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Recommendation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    TelemetryReadingCreate:
+      type: object
+      required:
+        - shipment_id
+        - trailer_id
+        - recorded_at
+        - temperature_c
+      properties:
+        shipment_id:
+          type: string
+          minLength: 1
+        trailer_id:
+          type: string
+          minLength: 1
+        recorded_at:
+          type: string
+          format: date-time
+        temperature_c:
+          type: number
+          minimum: -40
+          maximum: 60
+        source:
+          type: string
+          default: telemetry_provider
+    TelemetryIngestResult:
+      type: object
+      required:
+        - shipment_id
+        - reading_accepted
+        - decision_state
+        - assessment
+      properties:
+        shipment_id:
+          type: string
+        reading_accepted:
+          type: boolean
+        decision_state:
+          $ref: "#/components/schemas/DecisionState"
+        assessment:
+          $ref: "#/components/schemas/ShelfLifeAssessment"
+        recommendation:
+          anyOf:
+            - $ref: "#/components/schemas/RerouteRecommendation"
+            - type: "null"
+    DashboardShipment:
+      type: object
+      required:
+        - shipment_id
+        - trailer_id
+        - commodity_name
+        - decision_state
+        - remaining_shelf_life_hours
+        - urgency
+        - expected_arrival_at
+      properties:
+        shipment_id:
+          type: string
+        trailer_id:
+          type: string
+        commodity_name:
+          type: string
+        decision_state:
+          $ref: "#/components/schemas/DecisionState"
+        remaining_shelf_life_hours:
+          type: number
+          minimum: 0
+        urgency:
+          $ref: "#/components/schemas/Urgency"
+        expected_arrival_at:
+          type: string
+          format: date-time
+        recommended_destination:
+          type:
+            - string
+            - "null"
+    DashboardShipmentDetail:
+      allOf:
+        - $ref: "#/components/schemas/DashboardShipment"
+        - type: object
+          required:
+            - assessment
+          properties:
+            assessment:
+              $ref: "#/components/schemas/ShelfLifeAssessment"
+            recommendation:
+              anyOf:
+                - $ref: "#/components/schemas/RerouteRecommendation"
+                - type: "null"
+            recovery_reason:
+              type:
+                - string
+                - "null"
+    ShelfLifeAssessment:
+      type: object
+      required:
+        - assessment_id
+        - shipment_id
+        - calculated_at
+        - remaining_shelf_life_hours
+        - risk_status
+        - reason_codes
+      properties:
+        assessment_id:
+          type: string
+        shipment_id:
+          type: string
+        calculated_at:
+          type: string
+          format: date-time
+        remaining_shelf_life_hours:
+          type: number
+          minimum: 0
+        risk_status:
+          type: string
+          enum:
+            - healthy
+            - watch
+            - at_risk
+            - manual_follow_up_required
+        temperature_excursion_minutes:
+          type: integer
+          minimum: 0
+        reason_codes:
+          type: array
+          items:
+            type: string
+    RerouteRecommendation:
+      type: object
+      required:
+        - recommendation_id
+        - shipment_id
+        - assessment_id
+        - urgency
+        - status
+        - rationale
+      properties:
+        recommendation_id:
+          type: string
+        shipment_id:
+          type: string
+        assessment_id:
+          type: string
+        recommended_destination:
+          type:
+            - string
+            - "null"
+        urgency:
+          $ref: "#/components/schemas/Urgency"
+        expires_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - available
+            - expired
+            - not_viable
+            - approved
+        rationale:
+          type: string
+    ApprovalCreate:
+      type: object
+      required:
+        - approved_by
+      properties:
+        approved_by:
+          type: string
+          minLength: 1
+        decision_note:
+          type: string
+          maxLength: 500
+    ApprovalRecord:
+      type: object
+      required:
+        - approval_id
+        - recommendation_id
+        - shipment_id
+        - approved_by
+        - approved_at
+        - decision
+        - resulting_destination
+      properties:
+        approval_id:
+          type: string
+        recommendation_id:
+          type: string
+        shipment_id:
+          type: string
+        approved_by:
+          type: string
+        approved_at:
+          type: string
+          format: date-time
+        decision:
+          type: string
+          enum:
+            - approved
+            - rejected
+            - manual_follow_up
+        resulting_destination:
+          type: string
+        decision_note:
+          type:
+            - string
+            - "null"
+    DecisionState:
+      type: string
+      enum:
+        - healthy
+        - watch
+        - at_risk
+        - salvage_recommended
+        - reroute_approved
+        - manual_follow_up_required
+    Urgency:
+      type: string
+      enum:
+        - low
+        - medium
+        - high
+        - critical
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        detail:
+          type:
+            - string
+            - "null"
