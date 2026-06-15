@@ -11,6 +11,13 @@ from pydantic import BaseModel
 from backend.src.models.approval import ApprovalRecord, RerouteRecommendation
 from backend.src.models.assessment import ShelfLifeAssessment
 from backend.src.models.commodity import CommodityThermalProfile
+from backend.src.models.demo import (
+    DemoScenario,
+    DemoShipmentState,
+    ManagerDecisionEvent,
+    PresenterControlEvent,
+    SimulationStep,
+)
 from backend.src.models.shipment import Shipment
 from backend.src.models.telemetry import TrailerTelemetryReading
 
@@ -61,6 +68,35 @@ class SQLiteStore:
                 shipment_id TEXT NOT NULL,
                 payload TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS demo_scenarios (
+                scenario_id TEXT PRIMARY KEY,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS demo_shipments (
+                scenario_id TEXT NOT NULL,
+                shipment_id TEXT NOT NULL,
+                payload TEXT NOT NULL,
+                PRIMARY KEY (scenario_id, shipment_id)
+            );
+            CREATE TABLE IF NOT EXISTS demo_simulation_steps (
+                step_id TEXT PRIMARY KEY,
+                scenario_id TEXT NOT NULL,
+                step_number INTEGER NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS demo_presenter_events (
+                event_id TEXT PRIMARY KEY,
+                scenario_id TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS demo_manager_decisions (
+                event_id TEXT PRIMARY KEY,
+                scenario_id TEXT NOT NULL,
+                shipment_id TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                payload TEXT NOT NULL
+            );
             """
         )
         self.conn.commit()
@@ -74,6 +110,11 @@ class SQLiteStore:
             DELETE FROM telemetry_readings;
             DELETE FROM shipments;
             DELETE FROM commodity_profiles;
+            DELETE FROM demo_manager_decisions;
+            DELETE FROM demo_presenter_events;
+            DELETE FROM demo_simulation_steps;
+            DELETE FROM demo_shipments;
+            DELETE FROM demo_scenarios;
             """
         )
         self.conn.commit()
@@ -215,6 +256,81 @@ class SQLiteStore:
             self.save_profile(profile)
         for shipment in shipments:
             self.save_shipment(shipment)
+
+    def save_demo_scenario(self, scenario: DemoScenario) -> None:
+        self._upsert("demo_scenarios", "scenario_id", scenario.scenario_id, scenario)
+
+    def get_demo_scenario(self, scenario_id: str) -> DemoScenario | None:
+        return self._get("demo_scenarios", "scenario_id", scenario_id, DemoScenario)
+
+    def save_demo_shipment(self, scenario_id: str, shipment: DemoShipmentState) -> None:
+        self.conn.execute(
+            """
+            INSERT OR REPLACE INTO demo_shipments (scenario_id, shipment_id, payload)
+            VALUES (?, ?, ?)
+            """,
+            (scenario_id, shipment.shipment_id, self._payload(shipment)),
+        )
+        self.conn.commit()
+
+    def list_demo_shipments(self, scenario_id: str) -> list[DemoShipmentState]:
+        rows = self.conn.execute(
+            "SELECT payload FROM demo_shipments WHERE scenario_id = ? ORDER BY shipment_id",
+            (scenario_id,),
+        ).fetchall()
+        return [DemoShipmentState.model_validate_json(row["payload"]) for row in rows]
+
+    def save_demo_simulation_step(self, step: SimulationStep) -> None:
+        self.conn.execute(
+            """
+            INSERT OR REPLACE INTO demo_simulation_steps (step_id, scenario_id, step_number, payload)
+            VALUES (?, ?, ?, ?)
+            """,
+            (step.step_id, step.scenario_id, step.step_number, self._payload(step)),
+        )
+        self.conn.commit()
+
+    def save_demo_presenter_event(self, event: PresenterControlEvent) -> None:
+        self.conn.execute(
+            """
+            INSERT OR REPLACE INTO demo_presenter_events (event_id, scenario_id, created_at, payload)
+            VALUES (?, ?, ?, ?)
+            """,
+            (event.event_id, event.scenario_id, event.created_at.isoformat(), self._payload(event)),
+        )
+        self.conn.commit()
+
+    def save_demo_manager_decision(self, event: ManagerDecisionEvent) -> None:
+        self.conn.execute(
+            """
+            INSERT OR REPLACE INTO demo_manager_decisions (event_id, scenario_id, shipment_id, created_at, payload)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (event.event_id, event.scenario_id, event.shipment_id, event.created_at.isoformat(), self._payload(event)),
+        )
+        self.conn.commit()
+
+    def clear_demo_state(self, scenario_id: str | None = None) -> None:
+        if scenario_id is None:
+            self.conn.executescript(
+                """
+                DELETE FROM demo_manager_decisions;
+                DELETE FROM demo_presenter_events;
+                DELETE FROM demo_simulation_steps;
+                DELETE FROM demo_shipments;
+                DELETE FROM demo_scenarios;
+                """
+            )
+        else:
+            for table in (
+                "demo_manager_decisions",
+                "demo_presenter_events",
+                "demo_simulation_steps",
+                "demo_shipments",
+                "demo_scenarios",
+            ):
+                self.conn.execute(f"DELETE FROM {table} WHERE scenario_id = ?", (scenario_id,))
+        self.conn.commit()
 
     def _upsert(self, table: str, key: str, value: str, model: BaseModel) -> None:
         self.conn.execute(

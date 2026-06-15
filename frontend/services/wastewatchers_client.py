@@ -6,6 +6,7 @@ import httpx
 from pydantic import BaseModel, TypeAdapter
 
 from backend.src.models.approval import ApprovalCreate, ApprovalRecord
+from backend.src.models.demo import DemoDashboardState, ManagerDecisionRequest, SimulationConfig
 from backend.src.models.telemetry import TelemetryIngestResult, TrailerTelemetryReading
 
 
@@ -55,6 +56,46 @@ class WasteWatchersClient:
             json=approval.model_dump(mode="json"),
         )
         return ApprovalRecord.model_validate(payload)
+
+    def get_demo_dashboard(self) -> DemoDashboardState:
+        payload = self._request("GET", "/demo/dashboard")
+        return DemoDashboardState.model_validate(payload)
+
+    def load_demo_scenario(self) -> DemoDashboardState:
+        payload = self._request("POST", "/demo/scenario/load")
+        return DemoDashboardState.model_validate(payload)
+
+    def reset_demo_scenario(self) -> DemoDashboardState:
+        payload = self._request("POST", "/demo/scenario/reset")
+        return DemoDashboardState.model_validate(payload)
+
+    def start_demo_simulation(self, config: SimulationConfig) -> DemoDashboardState:
+        payload = self._request("POST", "/demo/simulation/start", json=config.model_dump(mode="json"))
+        return DemoDashboardState.model_validate(payload)
+
+    def pause_demo_simulation(self) -> DemoDashboardState:
+        payload = self._request("POST", "/demo/simulation/pause")
+        return DemoDashboardState.model_validate(payload)
+
+    def advance_demo_simulation_step(self) -> DemoDashboardState:
+        payload = self._request("POST", "/demo/simulation/step")
+        return DemoDashboardState.model_validate(payload)
+
+    def apply_demo_control(self, shipment_id: str, control: str) -> DemoDashboardState:
+        payload = self._request("POST", f"/demo/controls/{shipment_id}/{control}")
+        return DemoDashboardState.model_validate(payload)
+
+    def apply_demo_manager_decision(
+        self,
+        shipment_id: str,
+        decision: ManagerDecisionRequest,
+    ) -> DemoDashboardState:
+        payload = self._request(
+            "POST",
+            f"/demo/shipments/{shipment_id}/decision",
+            json=decision.model_dump(mode="json"),
+        )
+        return DemoDashboardState.model_validate(payload)
 
     def _request(self, method: str, path: str, **kwargs: Any) -> Any:
         with httpx.Client(base_url=self.base_url, timeout=10) as client:

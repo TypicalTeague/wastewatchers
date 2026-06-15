@@ -25,11 +25,12 @@ def create_app() -> FastAPI:
     async def app_error_handler(_: Request, exc: AppError) -> JSONResponse:
         return JSONResponse(status_code=exc.status_code, content=exc.response.model_dump())
 
-    from backend.src.api import approvals, shipments, telemetry
+    from backend.src.api import approvals, demo, shipments, telemetry
 
     app.include_router(telemetry.router)
     app.include_router(shipments.router)
     app.include_router(approvals.router)
+    app.include_router(demo.router)
     return app
 
 

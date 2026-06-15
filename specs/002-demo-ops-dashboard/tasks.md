@@ -15,10 +15,10 @@
 
 **Purpose**: Prepare the existing FastAPI, SQLite, pytest, and Streamlit project for additive demo work.
 
-- [ ] T001 Create demo backend module placeholders in backend/src/models/demo.py, backend/src/simulation/demo_scenarios.py, backend/src/simulation/demo_engine.py, backend/src/simulation/pallet_state.py, backend/src/services/demo_service.py, and backend/src/api/demo.py
-- [ ] T002 Create demo frontend component placeholders in frontend/components/control_center.py, frontend/components/pallet_visualization.py, frontend/components/telemetry_charts.py, and frontend/components/demo_controls.py
-- [ ] T003 [P] Create demo test placeholders in backend/tests/contract/test_demo_api_contract.py, backend/tests/integration/test_demo_scenario_flow.py, backend/tests/unit/test_demo_simulation.py, and frontend/tests/test_demo_dashboard_components.py
-- [ ] T004 [P] Add quickstart demo validation notes to docs/demo-ops-dashboard.md from specs/002-demo-ops-dashboard/quickstart.md
+- [X] T001 Create demo backend module placeholders in backend/src/models/demo.py, backend/src/simulation/demo_scenarios.py, backend/src/simulation/demo_engine.py, backend/src/simulation/pallet_state.py, backend/src/services/demo_service.py, and backend/src/api/demo.py
+- [X] T002 Create demo frontend component placeholders in frontend/components/control_center.py, frontend/components/pallet_visualization.py, frontend/components/telemetry_charts.py, and frontend/components/demo_controls.py
+- [X] T003 [P] Create demo test placeholders in backend/tests/contract/test_demo_api_contract.py, backend/tests/integration/test_demo_scenario_flow.py, backend/tests/unit/test_demo_simulation.py, and frontend/tests/test_demo_dashboard_components.py
+- [X] T004 [P] Add quickstart demo validation notes to docs/demo-ops-dashboard.md from specs/002-demo-ops-dashboard/quickstart.md
 
 ---
 
@@ -28,12 +28,12 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 Define DemoScenario, DemoShipmentState, DemoMetrics, SimulationStep, PresenterControlEvent, ManagerDecisionEvent, SimulationConfig, and ManagerDecisionRequest Pydantic models in backend/src/models/demo.py
-- [ ] T006 Extend backend/src/persistence/sqlite_store.py with demo scenario, shipment state, simulation step, presenter event, and manager decision persistence methods without changing existing shipment, telemetry, assessment, recommendation, or approval behavior
-- [ ] T007 Implement risk-level to pallet-color mapping and degraded telemetry visual state rules in backend/src/simulation/pallet_state.py
-- [ ] T008 Implement dashboard metric aggregation helpers for active, at-risk, critical, and value-protected totals in backend/src/services/demo_service.py
-- [ ] T009 Register additive /demo routes in backend/src/main.py through backend/src/api/demo.py without changing existing route behavior
-- [ ] T010 [P] Add demo API client method stubs for dashboard, scenario load/reset, simulation controls, presenter controls, and manager decisions in frontend/services/wastewatchers_client.py
+- [X] T005 Define DemoScenario, DemoShipmentState, DemoMetrics, SimulationStep, PresenterControlEvent, ManagerDecisionEvent, SimulationConfig, and ManagerDecisionRequest Pydantic models in backend/src/models/demo.py
+- [X] T006 Extend backend/src/persistence/sqlite_store.py with demo scenario, shipment state, simulation step, presenter event, and manager decision persistence methods without changing existing shipment, telemetry, assessment, recommendation, or approval behavior
+- [X] T007 Implement risk-level to pallet-color mapping and degraded telemetry visual state rules in backend/src/simulation/pallet_state.py
+- [X] T008 Implement dashboard metric aggregation helpers for active, at-risk, critical, and value-protected totals in backend/src/services/demo_service.py
+- [X] T009 Register additive /demo routes in backend/src/main.py through backend/src/api/demo.py without changing existing route behavior
+- [X] T010 [P] Add demo API client method stubs for dashboard, scenario load/reset, simulation controls, presenter controls, and manager decisions in frontend/services/wastewatchers_client.py
 
 **Checkpoint**: Foundation ready; user story implementation can now begin.
 
@@ -47,20 +47,20 @@
 
 ### Tests for User Story 1
 
-- [ ] T011 [P] [US1] Add contract tests for POST /demo/scenario/load, POST /demo/scenario/reset, and GET /demo/dashboard empty-state responses in backend/tests/contract/test_demo_api_contract.py
-- [ ] T012 [P] [US1] Add integration test for empty dashboard, scenario load, four distinct risk states, realistic shipment details, and reset behavior in backend/tests/integration/test_demo_scenario_flow.py
-- [ ] T013 [P] [US1] Add unit tests for deterministic seeded scenario generation and fictional data validation in backend/tests/unit/test_demo_scenarios.py
-- [ ] T014 [P] [US1] Add frontend tests for empty state, Load Demo Scenario action, control-center metrics, and four shipment cards in frontend/tests/test_demo_dashboard_components.py
+- [X] T011 [P] [US1] Add contract tests for POST /demo/scenario/load, POST /demo/scenario/reset, and GET /demo/dashboard empty-state responses in backend/tests/contract/test_demo_api_contract.py
+- [X] T012 [P] [US1] Add integration test for empty dashboard, scenario load, four distinct risk states, realistic shipment details, and reset behavior in backend/tests/integration/test_demo_scenario_flow.py
+- [X] T013 [P] [US1] Add unit tests for deterministic seeded scenario generation and fictional data validation in backend/tests/unit/test_demo_scenarios.py
+- [X] T014 [P] [US1] Add frontend tests for empty state, Load Demo Scenario action, control-center metrics, and four shipment cards in frontend/tests/test_demo_dashboard_components.py
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Implement deterministic four-shipment seed data with healthy, watch, at-risk, and critical salvage states in backend/src/simulation/demo_scenarios.py
-- [ ] T016 [US1] Implement load_demo_scenario, reset_demo_scenario, and get_dashboard_state service flows in backend/src/services/demo_service.py
-- [ ] T017 [US1] Implement POST /demo/scenario/load, POST /demo/scenario/reset, and GET /demo/dashboard endpoints in backend/src/api/demo.py
-- [ ] T018 [US1] Implement frontend client calls for load_demo_scenario, reset_demo_scenario, and get_demo_dashboard in frontend/services/wastewatchers_client.py
-- [ ] T019 [P] [US1] Implement logistics metrics and empty-state rendering helpers in frontend/components/control_center.py
-- [ ] T020 [P] [US1] Implement visual-only pallet condition rendering helpers in frontend/components/pallet_visualization.py
-- [ ] T021 [US1] Integrate empty state, Load Demo Scenario action, metrics, shipment cards, and pallet visualization into frontend/app.py
+- [X] T015 [P] [US1] Implement deterministic four-shipment seed data with healthy, watch, at-risk, and critical salvage states in backend/src/simulation/demo_scenarios.py
+- [X] T016 [US1] Implement load_demo_scenario, reset_demo_scenario, and get_dashboard_state service flows in backend/src/services/demo_service.py
+- [X] T017 [US1] Implement POST /demo/scenario/load, POST /demo/scenario/reset, and GET /demo/dashboard endpoints in backend/src/api/demo.py
+- [X] T018 [US1] Implement frontend client calls for load_demo_scenario, reset_demo_scenario, and get_demo_dashboard in frontend/services/wastewatchers_client.py
+- [X] T019 [P] [US1] Implement logistics metrics and empty-state rendering helpers in frontend/components/control_center.py
+- [X] T020 [P] [US1] Implement visual-only pallet condition rendering helpers in frontend/components/pallet_visualization.py
+- [X] T021 [US1] Integrate empty state, Load Demo Scenario action, metrics, shipment cards, and pallet visualization into frontend/app.py
 
 **Checkpoint**: User Story 1 is fully functional and testable independently.
 
