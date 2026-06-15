@@ -3,8 +3,7 @@
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
-**Note**: This template is filled in by the `/speckit-plan` command. See
-`.specify/templates/plan-template.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit-plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
 
 ## Summary
 
@@ -13,37 +12,26 @@
 ## Technical Context
 
 <!--
-  ACTION REQUIRED: Replace bracketed values with feature-specific decisions.
-  The core stack is fixed by the constitution.
+  ACTION REQUIRED: Replace the content in this section with the technical details
+  for the project. The structure here is presented in advisory capacity to guide
+  the iteration process.
 -->
 
-**Language/Version**: Python 3.12+  
-**Primary Dependencies**: FastAPI, Streamlit, Pydantic [plus feature-specific dependencies or N/A]  
-**Storage**: [if applicable, e.g., SQLite, PostgreSQL, files, or N/A]  
-**Testing**: pytest [plus FastAPI TestClient/Streamlit test approach or NEEDS CLARIFICATION]  
-**Target Platform**: [deployment/runtime target or NEEDS CLARIFICATION]  
-**Project Type**: FastAPI telemetry ingestion backend + Streamlit logistics frontend  
-**Performance Goals**: [domain-specific, e.g., ingestion rate, UI response time, or NEEDS CLARIFICATION]  
-**Constraints**: Pydantic models for all API and internal data passing; no raw dictionaries for typed data  
-**Scale/Scope**: [domain-specific, e.g., simulated devices, operators, facilities, or NEEDS CLARIFICATION]
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- User-value slices: Each prioritized user story in the spec is independently
-  deliverable, testable, and demonstrable.
-- Test-first confidence: Behavior changes identify failing automated tests first,
-  or document why only manual verification is currently possible.
-- Data and privacy boundaries: Persisted data, access rules, retention, and
-  sensitive fields are identified or explicitly marked N/A; API and internal
-  data contracts use Pydantic models, not raw dictionaries.
-- Observable and recoverable operations: Logging, error handling, retry,
-  rollback, and user-visible recovery paths are defined for applicable work.
-- Simplicity and traceability: Architecture choices are the smallest viable
-  approach and map back to requirements, user stories, and tasks.
-- Modular separation: Telemetry simulation, rules/business logic, API ingestion,
-  shared schemas, and Streamlit UI are assigned to separate files or modules.
+[Gates determined based on constitution file]
 
 ## Project Structure
 
@@ -51,37 +39,56 @@
 
 ```text
 specs/[###-feature]/
-|-- plan.md
-|-- research.md
-|-- data-model.md
-|-- quickstart.md
-|-- contracts/
-`-- tasks.md
+├── plan.md              # This file (/speckit-plan command output)
+├── research.md          # Phase 0 output (/speckit-plan command)
+├── data-model.md        # Phase 1 output (/speckit-plan command)
+├── quickstart.md        # Phase 1 output (/speckit-plan command)
+├── contracts/           # Phase 1 output (/speckit-plan command)
+└── tasks.md             # Phase 2 output (/speckit-tasks command - NOT created by /speckit-plan)
 ```
 
 ### Source Code (repository root)
-
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with concrete paths for
-  this feature. Preserve separation between simulation, rules, API, schemas,
-  and UI code.
+  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
+  for this feature. Delete unused options and expand the chosen structure with
+  real paths (e.g., apps/admin, packages/something). The delivered plan must
+  not include Option labels.
 -->
 
 ```text
+# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
+
+tests/
+├── contract/
+├── integration/
+└── unit/
+
+# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
 backend/
-|-- src/
-|   |-- models/          # Pydantic request/response/domain schemas
-|   |-- simulation/      # Telemetry simulation only
-|   |-- rules/           # Business logic/rules engine only
-|   |-- api/             # FastAPI routes and ingestion adapters
-|   `-- services/        # Orchestration between API, rules, and simulation
-`-- tests/
+├── src/
+│   ├── models/
+│   ├── services/
+│   └── api/
+└── tests/
 
 frontend/
-|-- app.py               # Streamlit entry point
-|-- components/          # UI components only
-|-- services/            # Frontend service clients using Pydantic models
-`-- tests/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   └── services/
+└── tests/
+
+# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real
@@ -93,5 +100,5 @@ directories captured above]
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| [e.g., additional service] | [current need] | [why FastAPI + Streamlit modules are insufficient] |
-| [e.g., raw dictionary boundary] | [specific problem] | [why a Pydantic model cannot represent it] |
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |

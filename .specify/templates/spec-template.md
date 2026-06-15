@@ -95,29 +95,6 @@
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
-### Data, Privacy, and Recovery Requirements *(mandatory when data or operations are involved)*
-
-- **DR-001**: Feature MUST identify persisted data, ownership, validation rules,
-  retention expectations, and access boundaries, or state N/A.
-- **DR-002**: Feature MUST identify any personal, household, location, vendor, or
-  operational data fields and justify why each is needed.
-- **DR-003**: Feature MUST define Pydantic models for API requests, API
-  responses, telemetry payloads, rule-engine inputs, rule-engine outputs, and
-  UI-facing data contracts. Raw dictionaries MUST NOT be used for typed data
-  passing.
-- **OR-001**: Feature MUST define logging, error handling, retry, rollback, and
-  user-visible recovery behavior for imports, exports, synchronization,
-  background work, notifications, or irreversible state changes, or state N/A.
-
-### Architecture Boundaries *(mandatory)*
-
-- **AB-001**: Telemetry simulation MUST live outside FastAPI route handlers,
-  Streamlit UI files, and rules-engine modules.
-- **AB-002**: Business logic and rules MUST live outside FastAPI route handlers,
-  telemetry simulation files, and Streamlit UI files.
-- **AB-003**: Streamlit UI code MUST consume service clients and Pydantic models;
-  it MUST NOT contain telemetry simulation or rules-engine logic.
-
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
