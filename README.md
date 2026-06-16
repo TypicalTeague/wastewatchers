@@ -150,6 +150,10 @@ wastewatcher/
 - **Reroute Recommendation**: Proposed salvage actions with destination and urgency
 - **Approval Record**: Manager decisions with auditable timestamp and reasoning
 
+## Sequence Diagram
+
+![UML Sequence Diagram](./SequenceDiagram.png)
+
 ## System Design Requirements
 
 - The system must ingest live trailer telemetry for active shipments, including shipment ID, trailer ID, temperature, and timestamp.
