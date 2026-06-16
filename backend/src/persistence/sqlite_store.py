@@ -290,6 +290,17 @@ class SQLiteStore:
         )
         self.conn.commit()
 
+    def list_demo_simulation_steps(self, scenario_id: str) -> list[SimulationStep]:
+        rows = self.conn.execute(
+            """
+            SELECT payload FROM demo_simulation_steps
+            WHERE scenario_id = ?
+            ORDER BY step_number
+            """,
+            (scenario_id,),
+        ).fetchall()
+        return [SimulationStep.model_validate_json(row["payload"]) for row in rows]
+
     def save_demo_presenter_event(self, event: PresenterControlEvent) -> None:
         self.conn.execute(
             """
