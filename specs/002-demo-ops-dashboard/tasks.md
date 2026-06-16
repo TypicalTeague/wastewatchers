@@ -74,20 +74,20 @@
 
 ### Tests for User Story 2
 
-- [ ] T022 [P] [US2] Add contract tests for POST /demo/simulation/start, POST /demo/simulation/pause, and POST /demo/simulation/step in backend/tests/contract/test_demo_api_contract.py
-- [ ] T023 [P] [US2] Add integration test for live simulation interval changes, repeated state changes, and manual pause-plus-step fallback in backend/tests/integration/test_demo_simulation_flow.py
-- [ ] T024 [P] [US2] Add unit tests for simulation ticks, shelf-life recalculation, temperature history growth, threshold crossings, and risk-to-color updates in backend/tests/unit/test_demo_simulation.py
-- [ ] T025 [P] [US2] Add frontend tests for simulation controls, visible state refresh, safe temperature bands, and temperature history chart data in frontend/tests/test_demo_dashboard_components.py
+- [X] T022 [P] [US2] Add contract tests for POST /demo/simulation/start, POST /demo/simulation/pause, and POST /demo/simulation/step in backend/tests/contract/test_demo_api_contract.py
+- [X] T023 [P] [US2] Add integration test for live simulation interval changes, repeated state changes, and manual pause-plus-step fallback in backend/tests/integration/test_demo_simulation_flow.py
+- [X] T024 [P] [US2] Add unit tests for simulation ticks, shelf-life recalculation, temperature history growth, threshold crossings, and risk-to-color updates in backend/tests/unit/test_demo_simulation.py
+- [X] T025 [P] [US2] Add frontend tests for simulation controls, visible state refresh, safe temperature bands, and temperature history chart data in frontend/tests/test_demo_dashboard_components.py
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Implement deterministic live and manual simulation step generation in backend/src/simulation/demo_engine.py
-- [ ] T027 [US2] Integrate existing shelf-life and recommendation rules into simulation state updates in backend/src/services/demo_service.py
-- [ ] T028 [US2] Persist simulation step history and generated telemetry readings through backend/src/persistence/sqlite_store.py
-- [ ] T029 [US2] Implement start, pause, and advance-step simulation endpoints in backend/src/api/demo.py
-- [ ] T030 [US2] Implement frontend client calls for start_demo_simulation, pause_demo_simulation, and advance_demo_simulation_step in frontend/services/wastewatchers_client.py
-- [ ] T031 [P] [US2] Implement temperature history chart and safe-band rendering helpers in frontend/components/telemetry_charts.py
-- [ ] T032 [US2] Integrate simulation controls, interval selector, manual refresh fallback, chart updates, and status messages into frontend/app.py
+- [X] T026 [US2] Implement deterministic live and manual simulation step generation in backend/src/simulation/demo_engine.py
+- [X] T027 [US2] Integrate existing shelf-life and recommendation rules into simulation state updates in backend/src/services/demo_service.py
+- [X] T028 [US2] Persist simulation step history and generated telemetry readings through backend/src/persistence/sqlite_store.py
+- [X] T029 [US2] Implement start, pause, and advance-step simulation endpoints in backend/src/api/demo.py
+- [X] T030 [US2] Implement frontend client calls for start_demo_simulation, pause_demo_simulation, and advance_demo_simulation_step in frontend/services/wastewatchers_client.py
+- [X] T031 [P] [US2] Implement temperature history chart and safe-band rendering helpers in frontend/components/telemetry_charts.py
+- [X] T032 [US2] Integrate simulation controls, interval selector, manual refresh fallback, chart updates, and status messages into frontend/app.py
 
 **Checkpoint**: User Stories 1 and 2 work independently.
 

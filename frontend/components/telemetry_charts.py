@@ -13,3 +13,7 @@ def temperature_chart_rows(shipment: DemoShipmentState) -> list[dict[str, object
         }
         for point in shipment.temperature_history
     ]
+
+
+def safe_temperature_band(shipment: DemoShipmentState) -> tuple[float, float]:
+    return shipment.safe_temp_min_c, shipment.safe_temp_max_c
