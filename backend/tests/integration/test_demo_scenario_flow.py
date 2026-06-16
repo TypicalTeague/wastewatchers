@@ -20,6 +20,9 @@ def test_demo_scenario_loads_four_realistic_shipments_and_resets(client):
         assert shipment["truck_id"]
         assert shipment["trailer_id"]
         assert shipment["pallet_id"]
+        assert shipment["pallet_position"] in {1, 2}
+        assert shipment["trailer_pallet_capacity"] == 4
+        assert shipment["commodity_abbrev"]
         assert shipment["crop"].startswith("Fictional")
         assert shipment["origin"]
         assert shipment["planned_destination"]
