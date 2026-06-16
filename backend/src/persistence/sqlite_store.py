@@ -280,6 +280,16 @@ class SQLiteStore:
         ).fetchall()
         return [DemoShipmentState.model_validate_json(row["payload"]) for row in rows]
 
+    def get_demo_shipment(self, scenario_id: str, shipment_id: str) -> DemoShipmentState | None:
+        row = self.conn.execute(
+            """
+            SELECT payload FROM demo_shipments
+            WHERE scenario_id = ? AND shipment_id = ?
+            """,
+            (scenario_id, shipment_id),
+        ).fetchone()
+        return DemoShipmentState.model_validate_json(row["payload"]) if row else None
+
     def save_demo_simulation_step(self, step: SimulationStep) -> None:
         self.conn.execute(
             """
@@ -320,6 +330,18 @@ class SQLiteStore:
             (event.event_id, event.scenario_id, event.shipment_id, event.created_at.isoformat(), self._payload(event)),
         )
         self.conn.commit()
+
+    def latest_demo_manager_decision(self, scenario_id: str, shipment_id: str) -> ManagerDecisionEvent | None:
+        row = self.conn.execute(
+            """
+            SELECT payload FROM demo_manager_decisions
+            WHERE scenario_id = ? AND shipment_id = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+            """,
+            (scenario_id, shipment_id),
+        ).fetchone()
+        return ManagerDecisionEvent.model_validate_json(row["payload"]) if row else None
 
     def clear_demo_state(self, scenario_id: str | None = None) -> None:
         if scenario_id is None:

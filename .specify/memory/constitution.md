@@ -1,22 +1,32 @@
 <!--
 Sync Impact Report
-Version change: 0.0.0 -> 1.0.0
+Version change: 1.0.0 -> 2.0.0
 Modified principles:
-- Placeholder principles -> I. User-Value Slices
-- Placeholder principles -> II. Test-First Confidence
-- Placeholder principles -> III. Explicit Data and Privacy Boundaries
-- Placeholder principles -> IV. Observable and Recoverable Operations
-- Placeholder principles -> V. Simplicity and Spec Traceability
+- I. User-Value Slices -> I. Decision Clarity Over Data Overload
+- II. Test-First Confidence -> II. Preserve Working Product Strengths
+- III. Explicit Data and Privacy Boundaries -> III. Truthful Data Provenance
+- IV. Observable and Recoverable Operations -> IV. Transparent Calculations
+- V. Simplicity and Spec Traceability -> V. Celsius Internally, Fahrenheit for Managers
+- Added: VI. Type Safety
+- Added: VII. Practical Backward Compatibility
+- Added: VIII. Testable Requirements
+- Added: IX. Simplicity Over Cleverness
+- Added: X. Human Approval for Consequential Decisions
+- Added: XI. No Secrets in Source Control
+- Added: XII. Brownfield Discipline
 Added sections:
-- Product and Technical Constraints
-- Development Workflow
+- Protected Product Strengths
+- Data, Calculation, and Approval Standards
+- Testing Standards
 Removed sections:
-- None
+- Generic Product and Technical Constraints wording replaced by WasteWatchers-specific constraints
 Templates requiring updates:
 - Updated: .specify/templates/plan-template.md
 - Updated: .specify/templates/spec-template.md
 - Updated: .specify/templates/tasks-template.md
 - Not present: .specify/templates/commands/*.md
+- Updated: README.md
+- Updated: AGENTS.md
 Follow-up TODOs:
 - None
 -->
@@ -24,98 +34,179 @@ Follow-up TODOs:
 
 ## Core Principles
 
-### I. User-Value Slices
-Every feature MUST be specified as independently deliverable user stories ordered
-by user value. Each P1 story MUST be demonstrable without depending on optional
-later stories, and every story MUST include an independent test method and
-acceptance scenarios. Rationale: the project must stay focused on working
-capabilities rather than broad, unfinished scaffolding.
+### I. Decision Clarity Over Data Overload
+WasteWatchers MUST help logistics and site managers quickly understand what is
+wrong, why it matters, what action is recommended, and what that action costs.
+Interfaces, APIs, and reports MUST prioritize actionable decisions over raw data
+volume. Every manager workflow MUST expose the shipment state, business impact,
+recommended next step, and cost or recovery tradeoff in plain operational terms.
+Rationale: the product exists to speed consequential cold-chain decisions, not
+to make managers interpret unfiltered telemetry.
 
-### II. Test-First Confidence
-Every code change that implements behavior MUST start with a failing automated
-test or a documented manual verification when automation is not yet available.
-Contract and integration tests MUST cover external interfaces, persistence
-behavior, and cross-component workflows. Rationale: waste tracking workflows can
-affect operational decisions, so behavior must be reproducible before it is
-trusted.
+### II. Preserve Working Product Strengths
+The current truck and pallet visualization, shipment queue, emerald visual
+identity, simulation workflow, responsive behavior, and dark mode MUST NOT be
+removed or materially weakened without explicit approval recorded in the plan.
+Changes MAY refine these areas, but the plan MUST identify how the existing
+strength is preserved and how regressions will be tested. Rationale: this is a
+brownfield product with useful working surfaces that should be improved in
+place rather than replaced.
 
-### III. Explicit Data and Privacy Boundaries
-Plans and specs MUST identify persisted data, retention expectations, access
-rules, and any personal, household, location, vendor, or operational data
-handled by the feature. Features MUST minimize collected data and MUST not add
-new sensitive fields without a stated purpose and validation rule. All API
-requests and internal data transfer between modules MUST use Pydantic models;
-raw dictionaries MUST NOT be used for typed domain or request data. Rationale:
-the domain can combine routine activity data into sensitive behavioral records,
-and strict models keep validation behavior explicit.
+### III. Truthful Data Provenance
+Every operational and financial value displayed, persisted, or returned by an
+API MUST identify whether it is measured, calculated, simulated, a demo
+assumption, manager entered, or unavailable. The system MUST NOT silently
+fabricate sensor readings, prices, capacity, weather, traffic, partner
+availability, or financial outcomes. Unavailable values MUST be shown as
+unavailable or excluded with an explanation. Rationale: managers can only trust
+recommendations when they can distinguish fact, calculation, and assumption.
 
-### IV. Observable and Recoverable Operations
-Features that perform imports, exports, synchronization, background work,
-notifications, or irreversible state changes MUST define logging, error
-handling, retry or rollback behavior, and user-visible recovery paths. Rationale:
-operators and users need clear evidence of what happened and a practical way to
-recover from failures.
+### IV. Transparent Calculations
+Financial recovery estimates, spoilage risk, shelf-life calculations,
+recommendation rankings, reroute option comparisons, and confidence scores MUST
+use centralized, documented, and testable formulas. UI components MUST NOT
+duplicate business formulas. Each material formula MUST define inputs,
+provenance expectations, boundary behavior, and failure behavior. Rationale:
+opaque or scattered calculations make recommendation quality impossible to
+audit or improve.
 
-### V. Simplicity and Spec Traceability
-Implementation MUST use the smallest architecture that satisfies the current
-spec and MUST trace code, tests, and tasks back to requirements and user
-stories. New frameworks, services, background jobs, and abstractions MUST be
-justified in the implementation plan with a rejected simpler alternative.
-Rationale: early project momentum depends on avoiding speculative architecture
-while preserving accountability from specification to delivery.
+### V. Celsius Internally, Fahrenheit for Managers
+Celsius is the canonical internal unit for backend calculations, thresholds,
+telemetry storage, and commodity rules. All manager-facing temperature values
+MUST be converted to Fahrenheit through a shared utility and clearly labeled
+with degrees Fahrenheit. APIs MAY expose Celsius for internal contracts, but UI
+view models and copy intended for managers MUST use Fahrenheit. Rationale:
+stable internal units protect calculations while Fahrenheit matches the target
+manager workflow.
 
-## Product and Technical Constraints
+### VI. Type Safety
+Stable domain data, API requests, API responses, simulation events,
+recommendation inputs, and recommendation outputs MUST use typed TypeScript
+interfaces on the Next.js frontend and Pydantic models on the FastAPI backend.
+Unstructured dictionaries or loose objects MUST NOT be used where a stable
+typed model is appropriate. Rationale: typed contracts prevent silent shape
+drift between operational data, calculations, and manager-facing displays.
 
-The project MUST keep feature specs technology-agnostic until the implementation
-plan records the selected stack, runtime, storage, test tools, and deployment
-target. Any feature that stores or transmits data MUST define entity ownership,
-validation rules, and error states before implementation begins.
+### VII. Practical Backward Compatibility
+Existing APIs, demo behavior, seeded scenarios, and manager workflows SHOULD
+remain backward compatible when practical. Breaking changes MUST be documented
+in the implementation plan with affected endpoints, UI workflows, tests, and
+migration or compatibility handling. Rationale: WasteWatchers is evolving from
+working demo and pilot flows; unnecessary breaks slow validation and obscure
+regressions.
 
-The implementation stack is Python 3.12 or newer. The telemetry ingestion
-backend MUST use FastAPI. The logistics frontend MUST use Streamlit. API
-requests, API responses, telemetry payloads, rule-engine inputs, rule-engine
-outputs, and UI-facing data contracts MUST be represented as Pydantic models
-instead of raw dictionaries.
+### VIII. Testable Requirements
+Every material calculation and manager workflow MUST have happy path, boundary,
+and failure path tests. Required coverage includes temperature conversion,
+financial calculations, recommendation eligibility, spoilage risk changes,
+simulation behavior, approval state transitions, and UI-preservation behavior
+when affected. Rationale: the product's decisions are only credible when the
+rules and workflows can be reproduced under normal and adverse conditions.
 
-The architecture MUST remain modular with strict separation of concerns.
-Telemetry simulation, business logic and rules, API ingestion, shared schemas,
-and UI code MUST live in separate files or modules. A feature plan MUST identify
-the concrete files or modules that own each concern before implementation.
+### IX. Simplicity Over Cleverness
+Implementation MUST extend the existing architecture unless the plan documents
+why the current services, models, components, or storage boundaries cannot meet
+the requirement. New frameworks, services, databases, queues, or abstractions
+MUST have a specific operational need and a simpler rejected alternative.
+Rationale: WasteWatchers needs dependable decision support, not speculative
+architecture.
 
-The repository currently uses Spec Kit with Codex integration and sequential git
-feature branch numbering. Generated feature artifacts MUST live under
-`specs/[###-feature-name]/`, and plans MUST replace template option blocks with
-the actual source and test paths chosen for the feature.
+### X. Human Approval for Consequential Decisions
+Recommendations MAY be generated automatically, but reroutes, manual reviews,
+rejections, and other consequential decisions MUST require explicit manager
+confirmation and an audit record. The audit record MUST capture who or what
+confirmed the action, when it happened, the selected option, relevant
+recommendation context, and any manager-entered note when supported. Rationale:
+automated advice can support decisions, but operational accountability remains
+human.
 
-## Development Workflow
+### XI. No Secrets in Source Control
+Credentials, API keys, customer data, private partner data, and production
+operational data MUST NOT be committed. Configuration examples MUST use safe
+placeholder values. Any feature requiring secrets MUST document environment
+variables and local setup without exposing real values. Rationale: repository
+history is not an appropriate place for private operational access.
 
-Work MUST proceed through specification, planning, task generation, and
-implementation unless a change is explicitly documentation-only or operational.
-The Constitution Check in each plan MUST pass before Phase 0 research and MUST
-be re-checked after Phase 1 design.
+### XII. Brownfield Discipline
+Plans and implementations MUST inspect existing code before modifying it and
+MUST reuse existing services, models, components, utilities, tests, and approval
+workflows when practical. Existing user-visible behavior MUST be treated as a
+contract unless the plan explicitly changes it. Rationale: disciplined
+brownfield work protects working value and keeps changes scoped.
 
-Tasks MUST be grouped by user story, preserve MVP-first delivery, and include
-test or verification tasks before implementation tasks for each story. Cross-
-cutting concerns such as privacy, observability, migration, and recovery MUST be
-represented as explicit tasks when applicable.
+## Protected Product Strengths
+
+WasteWatchers is an agriculture logistics decision support platform for
+refrigerated produce shipments. The protected product strengths are:
+
+- Truck and pallet visualization for shipment condition and trailer state.
+- Risk-ordered shipment queue and shipment detail workspace.
+- Emerald visual identity, responsive behavior, and dark mode.
+- Live and deterministic demo simulation workflows.
+- Recommendation logic for rerouting at-risk loads.
+- FastAPI backend with centralized rules, services, persistence, and Pydantic
+  models.
+- Current Next.js dashboard implementation and any maintained legacy Streamlit
+  demo surfaces until explicitly retired.
+
+Any plan that touches these areas MUST include preservation checks and tests or
+manual verification steps.
+
+## Data, Calculation, and Approval Standards
+
+Operational values MUST carry provenance metadata or be derived from typed
+models that document provenance. Financial language MUST use transparent terms
+such as estimated load value, estimated spoilage loss, reroute cost, estimated
+recovered value, and net recovery estimate. Vague wording such as "protected
+value" MUST NOT be introduced in new manager-facing copy unless it is defined
+with the underlying calculation.
+
+Spoilage logic MUST account for all modeled risk factors relevant to the
+feature, not temperature alone, when the data is available. When only
+temperature is available, the UI and recommendation rationale MUST make that
+limitation clear.
+
+Reroute recommendations MUST explain eligibility, ranking, tradeoffs, and
+confidence using centralized formulas. Option comparisons MUST show the cost
+breakdown required for a manager to approve, reject, or request review.
+
+## Testing Standards
+
+Frontend changes MUST run linting and a production build before completion.
+Backend changes MUST run all available backend tests before completion. A task
+or implementation MUST NOT be marked complete while required tests fail unless
+the failure is unrelated, documented, and explicitly accepted.
+
+New or changed material behavior MUST include tests for:
+
+- Temperature conversion and Fahrenheit display utilities.
+- Financial recovery, spoilage loss, reroute cost, and net estimate formulas.
+- Recommendation eligibility, ranking, confidence, and rejection paths.
+- Risk changes from temperature and other modeled spoilage factors.
+- Simulation state transitions, reset behavior, and outage or invalid-input
+  handling.
+- Approval, rejection, manual review, and audit state transitions.
+- Preservation of protected dashboard surfaces when those surfaces are touched.
 
 ## Governance
 
-This constitution supersedes conflicting project practices, templates, and
-informal workflow notes. Amendments MUST update this file, include a Sync Impact
-Report, and propagate any changed requirements to affected templates and runtime
-guidance.
+This constitution governs all WasteWatchers specifications, plans, tasks, and
+implementations. It supersedes conflicting project practices, templates, and
+informal workflow notes. Any exception MUST be documented in the implementation
+plan with its rationale, affected principles, risk, verification plan, and a
+simpler or safer alternative that was considered.
+
+Amendments MUST update this file, include a Sync Impact Report, propagate
+changed requirements to affected templates and runtime guidance, and preserve
+the original ratification date. Reviewers MUST block work that lacks required
+data provenance, transparent calculations, approval records, tests, protected
+surface preservation, or complexity justification.
 
 Versioning follows semantic versioning:
+
 - MAJOR for removing or redefining principles in a way that invalidates prior
   compliant work.
 - MINOR for adding principles, sections, or materially expanded governance.
 - PATCH for clarifications, wording improvements, and non-semantic corrections.
 
-Every implementation plan MUST document constitution compliance. Reviewers MUST
-block work that lacks required user-story tests or verification, data boundary
-analysis, recovery behavior, or complexity justification. Exceptions MUST be
-recorded in the plan's Complexity Tracking table with a rationale and a simpler
-alternative that was considered.
-
-**Version**: 1.0.0 | **Ratified**: 2026-06-15 | **Last Amended**: 2026-06-15
+**Version**: 2.0.0 | **Ratified**: 2026-06-15 | **Last Amended**: 2026-06-16

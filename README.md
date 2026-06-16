@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WasteWatchers
 
-## Getting Started
+WasteWatchers is an agriculture logistics decision support platform for
+refrigerated produce shipments. It helps logistics and site managers understand
+which loads are at risk, why the risk matters, what reroute or review action is
+recommended, and what that action is expected to cost or recover.
 
-First, run the development server:
+## Architecture
+
+- `backend/`: FastAPI backend with Pydantic models, simulation, rules, services,
+  persistence, and API routes.
+- `src/`: Next.js dashboard experience, including the current dashboard and
+  truck/pallet visualization.
+- `frontend/`: Maintained legacy Streamlit demo surfaces and tests.
+- `specs/`: Spec Kit feature artifacts.
+
+## Governance
+
+All specifications, plans, tasks, and implementations are governed by
+`.specify/memory/constitution.md`.
+
+Key constraints:
+
+- Preserve the current truck/pallet visualization, shipment queue, emerald
+  identity, simulation workflow, responsive behavior, and dark mode unless an
+  implementation plan records explicit approval to change them.
+- Keep Celsius as the backend/internal calculation unit and display
+  manager-facing temperatures in degrees Fahrenheit through shared utilities.
+- Label operational and financial values by provenance: measured, calculated,
+  simulated, demo assumption, manager entered, or unavailable.
+- Use centralized, documented, tested formulas for financial estimates, risk,
+  shelf life, recommendations, and confidence.
+- Require explicit manager confirmation and audit records for consequential
+  decisions such as reroutes, manual reviews, and rejections.
+
+## Development
+
+Install frontend dependencies:
+
+```bash
+npm install
+```
+
+Run the Next.js dashboard:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run the FastAPI backend:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+uvicorn backend.src.main:app --reload
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Run the legacy Streamlit demo surface when needed:
 
-## Learn More
+```bash
+streamlit run frontend/app.py
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Verification
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Frontend changes should run:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+npm run build
+```
 
-## Deploy on Vercel
+Backend changes should run:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pytest backend/tests
+```

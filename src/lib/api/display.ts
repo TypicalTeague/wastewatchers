@@ -1,6 +1,14 @@
-import type { DemoRiskLevel, DemoScenarioStatus, DemoShipmentState, PalletColor } from "./types";
+import type {
+  DataProvenance,
+  DemoRiskLevel,
+  DemoScenarioStatus,
+  DemoShipmentState,
+  OptionViability,
+  PalletColor,
+  SensorStatus,
+} from "./types";
 
-/** Display ordering only — values come from the API. */
+/** Display ordering only - values come from the API. */
 const RISK_SORT_ORDER: Record<DemoRiskLevel, number> = {
   critical: 0,
   at_risk: 1,
@@ -17,16 +25,18 @@ export function sortShipmentsByRisk(
   return [...shipments].sort(
     (a, b) =>
       RISK_SORT_ORDER[a.risk_level] - RISK_SORT_ORDER[b.risk_level] ||
+      a.time_remaining_to_act_minutes - b.time_remaining_to_act_minutes ||
+      a.remaining_shelf_life_hours - b.remaining_shelf_life_hours ||
       a.shipment_id.localeCompare(b.shipment_id),
   );
 }
 
 export function riskHeadline(risk: DemoRiskLevel): string {
   const labels: Record<DemoRiskLevel, string> = {
-    critical: "Critical — act now",
-    at_risk: "At risk — reroute likely",
-    watch: "Watch — monitor closely",
-    healthy: "Healthy — on track",
+    critical: "Critical - act now",
+    at_risk: "At risk - reroute likely",
+    watch: "Watch - monitor closely",
+    healthy: "Healthy - on track",
     manual_review: "Needs manual review",
     reroute_approved: "Reroute approved",
     rejected: "Shipment rejected",
@@ -50,7 +60,7 @@ export function simulationModeLabel(status: DemoScenarioStatus): string {
     return "Live simulation running";
   }
   if (status === "paused") {
-    return "Simulation paused — use Advance Step for manual updates";
+    return "Simulation paused - use Advance Step for manual updates";
   }
   return "Simulation ready";
 }
@@ -80,7 +90,7 @@ export function shelfLifeSummary(shipment: DemoShipmentState): string {
 export function temperatureSummary(shipment: DemoShipmentState): string {
   const { temperature_c, safe_temp_min_c, safe_temp_max_c } = shipment;
   if (temperature_c < safe_temp_min_c) {
-    return "Colder than the safe range — check refrigeration";
+    return "Colder than the safe range - check refrigeration";
   }
   if (temperature_c > safe_temp_max_c) {
     return "Above the safe temperature range";
@@ -89,6 +99,9 @@ export function temperatureSummary(shipment: DemoShipmentState): string {
 }
 
 export function destinationSummary(shipment: DemoShipmentState): string {
+  if (shipment.recommended_decision) {
+    return shipment.recommended_decision.title;
+  }
   if (shipment.recommended_destination) {
     return `Recommended salvage destination: ${shipment.recommended_destination}`;
   }
@@ -98,7 +111,7 @@ export function destinationSummary(shipment: DemoShipmentState): string {
 export function actionWindowSummary(shipment: DemoShipmentState): string {
   const minutes = shipment.time_remaining_to_act_minutes;
   if (minutes <= 60) {
-    return `Decision needed within the next hour`;
+    return "Decision needed within the next hour";
   }
   const hours = Math.round(minutes / 60);
   return `About ${hours} hour${hours === 1 ? "" : "s"} to decide next steps`;
@@ -110,6 +123,44 @@ export function formatCurrency(value: number): string {
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+export function formatPercent(value: number): string {
+  return `${value.toFixed(value % 1 === 0 ? 0 : 1)}%`;
+}
+
+export function formatDateTime(value: string | null | undefined): string {
+  if (!value) {
+    return "Data unavailable";
+  }
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(value));
+}
+
+export function formatMinutes(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes} min`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return remainder === 0 ? `${hours} hr` : `${hours} hr ${remainder} min`;
+}
+
+export function formatMaybeValue(value: string | number | null, unit?: string | null): string {
+  if (value === null || value === undefined || value === "") {
+    return "Data unavailable";
+  }
+  if (typeof value === "number" && unit === "USD") {
+    return formatCurrency(value);
+  }
+  if (typeof value === "number" && unit === "percent") {
+    return formatPercent(value);
+  }
+  return unit ? `${value} ${unit}` : String(value);
 }
 
 export function riskBadgeClasses(risk: DemoRiskLevel): string {
@@ -150,7 +201,7 @@ export function palletShortLabel(color: PalletColor): string {
   return labels[color];
 }
 
-/** Visual gauge bounds derived from API safe band — display only. */
+/** Visual gauge bounds derived from API safe band - display only. */
 export function temperatureGaugeModel(shipment: DemoShipmentState): {
   min: number;
   max: number;
@@ -228,10 +279,55 @@ export function palletVisualizationTheme(color: PalletColor): {
   }
 }
 
+export function celsiusToFahrenheit(celsius: number): number {
+  return (celsius * 9) / 5 + 32;
+}
+
 export function formatTemperature(celsius: number): string {
-  return `${celsius.toFixed(1)}°C`;
+  return `${celsiusToFahrenheit(celsius).toFixed(1)}°F`;
+}
+
+export function formatTechnicalCelsius(celsius: number): string {
+  return `${celsius.toFixed(1)}°C internal`;
 }
 
 export function safeRangeLabel(shipment: DemoShipmentState): string {
-  return `${shipment.safe_temp_min_c.toFixed(0)}° to ${shipment.safe_temp_max_c.toFixed(0)}°C safe band`;
+  const min = celsiusToFahrenheit(shipment.safe_temp_min_c).toFixed(0);
+  const max = celsiusToFahrenheit(shipment.safe_temp_max_c).toFixed(0);
+  return `${min}° to ${max}°F safe band`;
+}
+
+export function provenanceLabel(provenance: DataProvenance): string {
+  const labels: Record<DataProvenance, string> = {
+    measured: "Measured",
+    calculated: "Calculated",
+    simulated: "Simulated",
+    demo_assumption: "Demo assumption",
+    manager_entered: "Manager entered",
+    unavailable: "Unavailable",
+  };
+  return labels[provenance];
+}
+
+export function freshnessLabel(status: SensorStatus | undefined): string {
+  const labels: Record<SensorStatus, string> = {
+    fresh: "Fresh telemetry",
+    stale: "Stale telemetry",
+    missing: "Telemetry missing",
+    simulated: "Simulated telemetry",
+  };
+  return status ? labels[status] : "Data unavailable";
+}
+
+export function optionViabilityLabel(viability: OptionViability): string {
+  const labels: Record<OptionViability, string> = {
+    recommended: "Recommended",
+    viable_alternative: "Viable alternative",
+    not_viable: "Not viable",
+  };
+  return labels[viability];
+}
+
+export function estimatedNetValueLabel(): string {
+  return "Estimated net value preserved";
 }

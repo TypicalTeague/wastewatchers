@@ -1,0 +1,554 @@
+openapi: 3.0.3
+info:
+  title: WasteWatchers Site Manager Control Center API
+  version: 0.1.0
+  description: >
+    Additive demo/control-center contract for manager decision support. Existing
+    /demo dashboard, scenario, and simulation endpoints remain available.
+servers:
+  - url: http://127.0.0.1:8000
+paths:
+  /demo/dashboard:
+    get:
+      summary: Get current demo control center state
+      operationId: getDemoDashboard
+      responses:
+        "200":
+          description: Current dashboard state with extended control-center fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/scenario/load:
+    post:
+      summary: Load deterministic demo scenario
+      operationId: loadDemoScenario
+      responses:
+        "200":
+          description: Loaded dashboard state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/scenario/reset:
+    post:
+      summary: Reset deterministic demo scenario
+      operationId: resetDemoScenario
+      responses:
+        "200":
+          description: Reset dashboard state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/simulation/start:
+    post:
+      summary: Start live demo simulation
+      operationId: startDemoSimulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulationConfig"
+      responses:
+        "200":
+          description: Dashboard state after simulation starts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/simulation/pause:
+    post:
+      summary: Pause live demo simulation
+      operationId: pauseDemoSimulation
+      responses:
+        "200":
+          description: Dashboard state after simulation pauses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/simulation/step:
+    post:
+      summary: Advance demo simulation one step
+      operationId: advanceDemoSimulationStep
+      responses:
+        "200":
+          description: Dashboard state after one simulation step
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+  /demo/shipments/{shipment_id}/decision:
+    post:
+      summary: Confirm a manager decision for a demo shipment
+      operationId: confirmDemoManagerDecision
+      parameters:
+        - name: shipment_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManagerDecisionRequest"
+      responses:
+        "200":
+          description: Dashboard state after confirmed decision
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoDashboardState"
+        "409":
+          description: Decision cannot be applied to the current shipment state
+components:
+  schemas:
+    DemoDashboardState:
+      type: object
+      required: [scenario_status, empty_state, metrics, shipments, message]
+      properties:
+        scenario_status:
+          $ref: "#/components/schemas/DemoScenarioStatus"
+        empty_state:
+          type: boolean
+        metrics:
+          $ref: "#/components/schemas/DemoMetrics"
+        shipments:
+          type: array
+          items:
+            $ref: "#/components/schemas/DemoShipmentState"
+        message:
+          type: string
+    DemoScenarioStatus:
+      type: string
+      enum: [empty, loaded, running, paused, reset]
+    DemoRiskLevel:
+      type: string
+      enum: [healthy, watch, at_risk, critical, manual_review, reroute_approved, rejected]
+    PalletColor:
+      type: string
+      enum: [green, yellow, red, gray]
+    DataProvenance:
+      type: string
+      enum: [measured, calculated, simulated, demo_assumption, manager_entered, unavailable]
+    DestinationType:
+      type: string
+      enum: [continue_delivery, secondary_market, food_processor, compost_facility, reject_dispose, manual_review]
+    OptionViability:
+      type: string
+      enum: [recommended, viable_alternative, not_viable]
+    SensorStatus:
+      type: string
+      enum: [fresh, stale, missing, simulated]
+    ConfidenceLevel:
+      type: string
+      enum: [high, medium, low, manual_review_required]
+    ManagerDecisionAction:
+      type: string
+      enum: [approve_reroute, send_manual_review, reject_shipment]
+    DemoMetrics:
+      type: object
+      required: [active_shipments, at_risk_shipments, critical_shipments, estimated_net_value_preserved_usd]
+      properties:
+        active_shipments:
+          type: integer
+          minimum: 0
+        at_risk_shipments:
+          type: integer
+          minimum: 0
+        critical_shipments:
+          type: integer
+          minimum: 0
+        estimated_net_value_preserved_usd:
+          type: number
+          minimum: 0
+        estimated_value_protected_usd:
+          type: number
+          minimum: 0
+          deprecated: true
+          description: Backward-compatible field retained during transition.
+    TemperatureReadingPoint:
+      type: object
+      required: [recorded_at, temperature_c]
+      properties:
+        recorded_at:
+          type: string
+          format: date-time
+        temperature_c:
+          type: number
+    DemoShipmentState:
+      type: object
+      required:
+        - shipment_id
+        - trailer_id
+        - truck_id
+        - pallet_id
+        - pallet_position
+        - trailer_pallet_capacity
+        - commodity_abbrev
+        - crop
+        - origin
+        - planned_destination
+        - risk_level
+        - pallet_color
+        - remaining_shelf_life_hours
+        - remaining_shelf_life_percent
+        - temperature_c
+        - safe_temp_min_c
+        - safe_temp_max_c
+        - temperature_history
+        - estimated_value_usd
+        - time_remaining_to_act_minutes
+      properties:
+        shipment_id:
+          type: string
+        trailer_id:
+          type: string
+        truck_id:
+          type: string
+        pallet_id:
+          type: string
+        pallet_position:
+          type: integer
+          minimum: 1
+          maximum: 8
+        trailer_pallet_capacity:
+          type: integer
+          minimum: 1
+          maximum: 8
+        commodity_abbrev:
+          type: string
+        crop:
+          type: string
+        origin:
+          type: string
+        planned_destination:
+          type: string
+        recommended_destination:
+          type: string
+          nullable: true
+          deprecated: true
+        risk_level:
+          $ref: "#/components/schemas/DemoRiskLevel"
+        pallet_color:
+          $ref: "#/components/schemas/PalletColor"
+        remaining_shelf_life_hours:
+          type: number
+          minimum: 0
+        remaining_shelf_life_percent:
+          type: number
+          minimum: 0
+          maximum: 100
+        expected_shelf_life_at_arrival_hours:
+          type: number
+          minimum: 0
+        temperature_c:
+          type: number
+          description: Canonical backend temperature unit.
+        safe_temp_min_c:
+          type: number
+        safe_temp_max_c:
+          type: number
+        temperature_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemperatureReadingPoint"
+        estimated_value_usd:
+          type: number
+          minimum: 0
+        value_protected_usd:
+          type: number
+          minimum: 0
+          deprecated: true
+        time_remaining_to_act_minutes:
+          type: integer
+          minimum: 0
+        confirmation_message:
+          type: string
+        latest_update_at:
+          type: string
+          format: date-time
+        change_summary:
+          type: string
+        sensor_freshness:
+          $ref: "#/components/schemas/SensorFreshness"
+        risk_drivers:
+          type: array
+          items:
+            $ref: "#/components/schemas/RiskDriver"
+        confidence:
+          $ref: "#/components/schemas/ConfidenceScore"
+        response_options:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResponseOption"
+        recommended_decision:
+          allOf:
+            - $ref: "#/components/schemas/RecommendedDecision"
+          nullable: true
+        event_timeline:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimelineEvent"
+        technical_details:
+          type: array
+          items:
+            type: string
+    SensorFreshness:
+      type: object
+      required: [status, message, provenance]
+      properties:
+        status:
+          $ref: "#/components/schemas/SensorStatus"
+        latest_update_at:
+          type: string
+          format: date-time
+          nullable: true
+        minutes_since_update:
+          type: integer
+          minimum: 0
+          nullable: true
+        message:
+          type: string
+        provenance:
+          $ref: "#/components/schemas/DataProvenance"
+    RiskDriver:
+      type: object
+      required: [driver_id, label, description, impact, provenance]
+      properties:
+        driver_id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        impact:
+          type: string
+          enum: [low, medium, high, critical]
+        direction:
+          type: string
+          enum: [improving, stable, worsening, unknown]
+        provenance:
+          $ref: "#/components/schemas/DataProvenance"
+    ConfidenceScore:
+      type: object
+      required: [level, reason_codes, provenance, manual_review_required]
+      properties:
+        level:
+          $ref: "#/components/schemas/ConfidenceLevel"
+        score_percent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+        reason_codes:
+          type: array
+          items:
+            type: string
+        provenance:
+          $ref: "#/components/schemas/DataProvenance"
+        manual_review_required:
+          type: boolean
+    FinancialBreakdown:
+      type: object
+      required:
+        - original_cargo_value_usd
+        - destination_acceptance_percentage
+        - expected_gross_recovery_usd
+        - value_recovery_usd
+        - avoided_disposal_cost_usd
+        - rerouting_cost_usd
+        - sorting_handling_cost_usd
+        - processing_or_destination_fee_usd
+        - incremental_cost_usd
+        - expected_unrecovered_value_usd
+        - estimated_net_value_preserved_usd
+        - is_estimate
+        - not_guaranteed_message
+      properties:
+        original_cargo_value_usd:
+          type: number
+          minimum: 0
+        destination_acceptance_percentage:
+          type: number
+          minimum: 0
+          maximum: 100
+        expected_gross_recovery_usd:
+          type: number
+          minimum: 0
+        value_recovery_usd:
+          type: number
+          minimum: 0
+        avoided_disposal_cost_usd:
+          type: number
+          minimum: 0
+        rerouting_cost_usd:
+          type: number
+          minimum: 0
+        sorting_handling_cost_usd:
+          type: number
+          minimum: 0
+        processing_or_destination_fee_usd:
+          type: number
+          minimum: 0
+        incremental_cost_usd:
+          type: number
+          minimum: 0
+        expected_unrecovered_value_usd:
+          type: number
+          minimum: 0
+        estimated_net_value_preserved_usd:
+          type: number
+        is_estimate:
+          type: boolean
+        not_guaranteed_message:
+          type: string
+    ResponseOption:
+      type: object
+      required:
+        - option_id
+        - destination_type
+        - destination_name
+        - label
+        - travel_time_minutes
+        - condition_at_arrival
+        - shelf_life_at_arrival_hours
+        - acceptance_percentage
+        - financial_breakdown
+        - expected_waste_diversion_percent
+        - operational_risk
+        - viability
+        - viability_reasons
+        - food_safety_passed
+        - confidence
+      properties:
+        option_id:
+          type: string
+        destination_type:
+          $ref: "#/components/schemas/DestinationType"
+        destination_name:
+          type: string
+        label:
+          type: string
+        travel_time_minutes:
+          type: integer
+          minimum: 0
+        condition_at_arrival:
+          type: string
+        shelf_life_at_arrival_hours:
+          type: number
+          minimum: 0
+        acceptance_percentage:
+          type: number
+          minimum: 0
+          maximum: 100
+        financial_breakdown:
+          $ref: "#/components/schemas/FinancialBreakdown"
+        expected_waste_diversion_percent:
+          type: number
+          minimum: 0
+          maximum: 100
+        operational_risk:
+          type: string
+          enum: [low, medium, high]
+        viability:
+          $ref: "#/components/schemas/OptionViability"
+        viability_reasons:
+          type: array
+          items:
+            type: string
+        food_safety_passed:
+          type: boolean
+        confidence:
+          $ref: "#/components/schemas/ConfidenceScore"
+        assumptions:
+          type: array
+          items:
+            type: string
+    RecommendedDecision:
+      type: object
+      required:
+        - recommendation_id
+        - title
+        - option_id
+        - destination_name
+        - rationale
+        - travel_time_minutes
+        - expected_condition_at_arrival
+        - financial_effect
+        - confidence
+        - expected_post_action_risk
+        - status
+      properties:
+        recommendation_id:
+          type: string
+        title:
+          type: string
+        option_id:
+          type: string
+        destination_name:
+          type: string
+        deadline_minutes:
+          type: integer
+          minimum: 0
+        rationale:
+          type: string
+        travel_time_minutes:
+          type: integer
+          minimum: 0
+        expected_condition_at_arrival:
+          type: string
+        financial_effect:
+          $ref: "#/components/schemas/FinancialBreakdown"
+        confidence:
+          $ref: "#/components/schemas/ConfidenceScore"
+        expected_post_action_risk:
+          $ref: "#/components/schemas/DemoRiskLevel"
+        status:
+          type: string
+          enum: [available, approved, manual_review, rejected, not_viable, unavailable]
+    TimelineEvent:
+      type: object
+      required: [event_id, occurred_at, label, description, provenance]
+      properties:
+        event_id:
+          type: string
+        occurred_at:
+          type: string
+          format: date-time
+        label:
+          type: string
+        description:
+          type: string
+        provenance:
+          $ref: "#/components/schemas/DataProvenance"
+    ManagerDecisionRequest:
+      type: object
+      required: [action, actor_label, confirmation_acknowledged]
+      properties:
+        action:
+          $ref: "#/components/schemas/ManagerDecisionAction"
+        actor_label:
+          type: string
+          minLength: 1
+        option_id:
+          type: string
+          nullable: true
+        decision_note:
+          type: string
+          nullable: true
+          maxLength: 500
+        confirmation_acknowledged:
+          type: boolean
+    SimulationConfig:
+      type: object
+      required: [interval_seconds]
+      properties:
+        interval_seconds:
+          type: integer
+          minimum: 1
+          maximum: 60

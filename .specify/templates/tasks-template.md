@@ -8,7 +8,11 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests**: Tests are REQUIRED for every material calculation and manager
+workflow. Include happy path, boundary, and failure path tests before
+implementation tasks for temperature conversion, financial calculations,
+recommendation eligibility, risk changes, simulation behavior, approval state
+transitions, and any touched protected dashboard surface.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -20,26 +24,28 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Backend**: `backend/src/`, `backend/tests/`
+- **Next.js dashboard**: `src/app/`, `src/lib/`
+- **Legacy Streamlit demo**: `frontend/`
+- **Feature docs**: `specs/[###-feature-name]/`
 
-<!-- 
+<!--
   ============================================================================
   IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
-  
+
   The /speckit-tasks command MUST replace these with actual tasks based on:
   - User stories from spec.md (with their priorities P1, P2, P3...)
   - Feature requirements from plan.md
   - Entities from data-model.md
   - Endpoints from contracts/
-  
+  - WasteWatchers constitution requirements for provenance, calculations,
+    Fahrenheit display, approval audit, preservation, and testing
+
   Tasks MUST be organized by user story so each story can be:
   - Implemented independently
   - Tested independently
   - Delivered as an MVP increment
-  
+
   DO NOT keep these sample tasks in the generated tasks.md file.
   ============================================================================
 -->
@@ -48,9 +54,9 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T001 Confirm existing backend, Next.js dashboard, and affected legacy Streamlit paths
+- [ ] T002 Confirm relevant Next.js docs in node_modules/next/dist/docs/ before editing Next.js code
+- [ ] T003 [P] Configure or verify linting, formatting, and test commands
 
 ---
 
@@ -58,42 +64,45 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
+**CRITICAL**: No user story work can begin until this phase is complete
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 Create or update typed Pydantic models and TypeScript interfaces shared by all stories
+- [ ] T005 [P] Create or update shared Celsius-to-Fahrenheit display utility
+- [ ] T006 [P] Create or update centralized calculation utilities for financials, risk, shelf life, ranking, or confidence
+- [ ] T007 Create or update provenance model fields and unavailable-value handling
+- [ ] T008 Configure error handling, logging, and manager-visible recovery paths
+- [ ] T009 Setup or update approval audit state handling
+- [ ] T010 Confirm no secrets, customer data, API keys, or private partner data are introduced
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
 ---
 
-## Phase 3: User Story 1 - [Title] (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - [Title] (Priority: P1) MVP
 
 **Goal**: [Brief description of what this story delivers]
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 1
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T011 [P] [US1] Contract test for [endpoint] in backend/tests/contract/test_[name].py
+- [ ] T012 [P] [US1] Integration test for [user journey] in backend/tests/integration/test_[name].py
+- [ ] T013 [P] [US1] Unit tests for [temperature/financial/risk/recommendation/approval] happy, boundary, and failure paths in backend/tests/unit/test_[name].py
+- [ ] T014 [P] [US1] Frontend test or documented verification for touched truck, queue, simulation, emerald, dark mode, or responsive behavior
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T015 [P] [US1] Create or update typed model/interface in [exact path]
+- [ ] T016 [US1] Implement centralized service/rule/calculation in [exact path]
+- [ ] T017 [US1] Implement API or frontend workflow in [exact path]
+- [ ] T018 [US1] Add provenance labeling and unavailable-value behavior
+- [ ] T019 [US1] Add explicit approval/audit behavior when the story includes a consequential decision
+- [ ] T020 [US1] Preserve or extend protected UI/workflow surface when affected
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -105,17 +114,19 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 2
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T021 [P] [US2] Contract test for [endpoint] in backend/tests/contract/test_[name].py
+- [ ] T022 [P] [US2] Integration test for [user journey] in backend/tests/integration/test_[name].py
+- [ ] T023 [P] [US2] Unit tests for relevant happy, boundary, and failure paths in backend/tests/unit/test_[name].py
+- [ ] T024 [P] [US2] Frontend test or documented preservation verification when UI is touched
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T025 [P] [US2] Create or update typed model/interface in [exact path]
+- [ ] T026 [US2] Implement centralized service/rule/calculation in [exact path]
+- [ ] T027 [US2] Implement API or frontend workflow in [exact path]
+- [ ] T028 [US2] Integrate with User Story 1 components without breaking independent testability
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -127,16 +138,18 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 3
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T029 [P] [US3] Contract test for [endpoint] in backend/tests/contract/test_[name].py
+- [ ] T030 [P] [US3] Integration test for [user journey] in backend/tests/integration/test_[name].py
+- [ ] T031 [P] [US3] Unit tests for relevant happy, boundary, and failure paths in backend/tests/unit/test_[name].py
+- [ ] T032 [P] [US3] Frontend test or documented preservation verification when UI is touched
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T033 [P] [US3] Create or update typed model/interface in [exact path]
+- [ ] T034 [US3] Implement centralized service/rule/calculation in [exact path]
+- [ ] T035 [US3] Implement API or frontend workflow in [exact path]
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -153,8 +166,12 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
 - [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
+- [ ] TXXX [P] Additional unit, integration, contract, or frontend tests required by the constitution in tests/
 - [ ] TXXX Security hardening
+- [ ] TXXX Confirm no secrets, real customer data, API keys, or private partner data are committed
+- [ ] TXXX Run frontend linting
+- [ ] TXXX Run frontend production build
+- [ ] TXXX Run all available backend tests
 - [ ] TXXX Run quickstart.md validation
 
 ---
@@ -167,7 +184,7 @@ Examples of foundational tasks (adjust based on your project):
 - **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
 - **User Stories (Phase 3+)**: All depend on Foundational phase completion
   - User stories can then proceed in parallel (if staffed)
-  - Or sequentially in priority order (P1 → P2 → P3)
+  - Or sequentially in priority order (P1 -> P2 -> P3)
 - **Polish (Final Phase)**: Depends on all desired user stories being complete
 
 ### User Story Dependencies
@@ -178,9 +195,9 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Within Each User Story
 
-- Tests (if included) MUST be written and FAIL before implementation
-- Models before services
-- Services before endpoints
+- Required tests MUST be written and FAIL before implementation
+- Models and interfaces before services
+- Services and centralized rules before endpoints or UI workflow code
 - Core implementation before integration
 - Story complete before moving to next priority
 
@@ -190,7 +207,7 @@ Examples of foundational tasks (adjust based on your project):
 - All Foundational tasks marked [P] can run in parallel (within Phase 2)
 - Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
 - All tests for a user story marked [P] can run in parallel
-- Models within a story marked [P] can run in parallel
+- Models/interfaces within a story marked [P] can run in parallel
 - Different user stories can be worked on in parallel by different team members
 
 ---
@@ -198,13 +215,14 @@ Examples of foundational tasks (adjust based on your project):
 ## Parallel Example: User Story 1
 
 ```bash
-# Launch all tests for User Story 1 together (if tests requested):
-Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
-Task: "Integration test for [user journey] in tests/integration/test_[name].py"
+# Launch all tests for User Story 1 together:
+Task: "Contract test for [endpoint] in backend/tests/contract/test_[name].py"
+Task: "Integration test for [user journey] in backend/tests/integration/test_[name].py"
+Task: "Unit tests for [calculation/workflow] in backend/tests/unit/test_[name].py"
 
-# Launch all models for User Story 1 together:
-Task: "Create [Entity1] model in src/models/[entity1].py"
-Task: "Create [Entity2] model in src/models/[entity2].py"
+# Launch model/interface work together:
+Task: "Update Pydantic model in backend/src/models/[entity].py"
+Task: "Update TypeScript interface in src/lib/api/types.ts"
 ```
 
 ---
@@ -221,10 +239,10 @@ Task: "Create [Entity2] model in src/models/[entity2].py"
 
 ### Incremental Delivery
 
-1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
+1. Complete Setup + Foundational -> Foundation ready
+2. Add User Story 1 -> Test independently -> Deploy/Demo
+3. Add User Story 2 -> Test independently -> Deploy/Demo
+4. Add User Story 3 -> Test independently -> Deploy/Demo
 5. Each story adds value without breaking previous stories
 
 ### Parallel Team Strategy
@@ -245,7 +263,7 @@ With multiple developers:
 - [P] tasks = different files, no dependencies
 - [Story] label maps task to specific user story for traceability
 - Each user story should be independently completable and testable
-- Verify tests fail before implementing
+- Verify required tests fail before implementing
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
