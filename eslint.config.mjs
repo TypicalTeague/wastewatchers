@@ -16,6 +16,10 @@ const eslintConfig = defineConfig([
     "coverage/**",
     "*.min.js",
     "next-env.d.ts",
+    // Python backend, Streamlit, and local virtualenv
+    ".venv/**",
+    "backend/**",
+    "frontend/**",
   ]),
 ]);
 
