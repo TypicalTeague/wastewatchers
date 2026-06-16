@@ -74,6 +74,10 @@
 
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
+- What happens when a required measured, partner, price, capacity, weather, or
+  traffic value is unavailable?
+- How does the manager workflow preserve current truck/pallet, queue,
+  simulation, dark mode, responsive, and emerald-identity behavior when touched?
 
 ## Requirements *(mandatory)*
 
@@ -89,11 +93,39 @@
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-006**: Every manager-facing operational or financial value MUST identify
+  whether it is measured, calculated, simulated, a demo assumption, manager
+  entered, or unavailable.
+- **FR-007**: Manager-facing temperatures MUST display in degrees Fahrenheit,
+  while backend calculations and thresholds remain in Celsius.
+- **FR-008**: Consequential decisions such as reroute approval, manual review,
+  and rejection MUST require explicit confirmation and produce an audit record.
 
 *Example of marking unclear requirements:*
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-009**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-010**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+
+### Data Provenance *(mandatory for operational or financial values)*
+
+- **[Value Name]**: [measured/calculated/simulated/demo assumption/manager entered/unavailable], [source], [fallback behavior]
+- **[Value Name]**: [measured/calculated/simulated/demo assumption/manager entered/unavailable], [source], [fallback behavior]
+
+### Calculation Requirements *(mandatory for risk, shelf life, financials, ranking, or confidence)*
+
+- **[Calculation Name]**: Inputs [list], formula owner [service/module], boundary behavior [describe], failure behavior [describe]
+- **[Calculation Name]**: Inputs [list], formula owner [service/module], boundary behavior [describe], failure behavior [describe]
+
+### Approval & Audit Requirements *(mandatory for consequential manager decisions)*
+
+- **[Decision]**: [confirmation required], [audit fields], [allowed states], [failure/retry behavior]
+
+### Product Strengths Preservation *(mandatory when UI/workflow is touched)*
+
+- **Truck/Pallet Visualization**: [unchanged/extended/not affected], verification [test or manual check]
+- **Shipment Queue**: [unchanged/extended/not affected], verification [test or manual check]
+- **Emerald Identity, Dark Mode, Responsive Behavior**: [unchanged/extended/not affected], verification [test or manual check]
+- **Simulation Workflow**: [unchanged/extended/not affected], verification [test or manual check]
 
 ### Key Entities *(include if feature involves data)*
 

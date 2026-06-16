@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 
 from backend.src.main import get_store
-from backend.src.models.demo import DemoDashboardState, SimulationConfig
+from backend.src.models.demo import DemoDashboardState, ManagerDecisionRequest, SimulationConfig
 from backend.src.persistence.sqlite_store import SQLiteStore
 from backend.src.services.demo_service import DemoService
 
@@ -41,3 +41,12 @@ def pause_demo_simulation(store: SQLiteStore = Depends(get_store)) -> DemoDashbo
 @router.post("/simulation/step", response_model=DemoDashboardState)
 def advance_demo_simulation_step(store: SQLiteStore = Depends(get_store)) -> DemoDashboardState:
     return DemoService(store).advance_simulation_step()
+
+
+@router.post("/shipments/{shipment_id}/decision", response_model=DemoDashboardState)
+def confirm_manager_decision(
+    shipment_id: str,
+    request: ManagerDecisionRequest,
+    store: SQLiteStore = Depends(get_store),
+) -> DemoDashboardState:
+    return DemoService(store).confirm_manager_decision(shipment_id, request)

@@ -6,5 +6,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+shell commands, and other important information, read the current plan at
+`specs/003-site-manager-control-center/plan.md` and
+`.specify/memory/constitution.md` before changing specifications, plans, tasks,
+or implementation. Preserve the brownfield WasteWatchers product strengths
+unless an implementation plan records explicit approval to change them.
 <!-- SPECKIT END -->

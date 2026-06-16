@@ -1,4 +1,4 @@
-import type { DemoDashboardState, SimulationConfig } from "./types";
+import type { DemoDashboardState, ManagerDecisionRequest, SimulationConfig } from "./types";
 
 const API_BASE = "/api/wastewatchers";
 
@@ -60,4 +60,14 @@ export async function pauseDemoSimulation(): Promise<DemoDashboardState> {
 
 export async function advanceDemoSimulationStep(): Promise<DemoDashboardState> {
   return request<DemoDashboardState>("/demo/simulation/step", { method: "POST" });
+}
+
+export async function confirmDemoManagerDecision(
+  shipmentId: string,
+  decision: ManagerDecisionRequest,
+): Promise<DemoDashboardState> {
+  return request<DemoDashboardState>(`/demo/shipments/${shipmentId}/decision`, {
+    method: "POST",
+    body: JSON.stringify(decision),
+  });
 }

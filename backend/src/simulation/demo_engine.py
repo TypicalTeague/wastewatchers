@@ -23,7 +23,15 @@ def order_shipments_by_risk(shipments: list[DemoShipmentState]) -> list[DemoShip
         "reroute_approved": 5,
         "rejected": 6,
     }
-    return sorted(shipments, key=lambda shipment: (risk_order[shipment.risk_level.value], shipment.shipment_id))
+    return sorted(
+        shipments,
+        key=lambda shipment: (
+            risk_order[shipment.risk_level.value],
+            shipment.time_remaining_to_act_minutes,
+            shipment.remaining_shelf_life_hours,
+            shipment.shipment_id,
+        ),
+    )
 
 
 def apply_simulation_step(
@@ -74,6 +82,17 @@ def _advance_shipment(
     index: int,
     recorded_at,
 ) -> DemoShipmentState:
+    if shipment.risk_level in {
+        DemoRiskLevel.REROUTE_APPROVED,
+        DemoRiskLevel.MANUAL_REVIEW,
+        DemoRiskLevel.REJECTED,
+    }:
+        return shipment.model_copy(
+            update={
+                "confirmation_message": "Decision already recorded; simulation did not create a new suggestion.",
+            }
+        )
+
     temperature_delta = 0.35 + (index * 0.2) + ((step_number - 1) * 0.05)
     next_temperature = round(shipment.temperature_c + temperature_delta, 1)
     shelf_life_loss = _shelf_life_loss(next_temperature, shipment.safe_temp_max_c)
@@ -95,6 +114,10 @@ def _advance_shipment(
             "recommended_destination": recommended_destination,
             "time_remaining_to_act_minutes": max(shipment.time_remaining_to_act_minutes - 15, 0),
             "confirmation_message": f"Simulation step {step_number} updated telemetry.",
+            "change_summary": (
+                f"Temperature moved to {next_temperature:.1f} C; "
+                f"shelf life changed to {next_hours:.1f} hours."
+            ),
         }
     )
 

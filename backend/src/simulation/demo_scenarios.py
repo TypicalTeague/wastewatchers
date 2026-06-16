@@ -34,7 +34,7 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
             "safe_temp_min_c": 0.0,
             "safe_temp_max_c": 2.0,
             "estimated_value_usd": 42000.0,
-            "value_protected_usd": 42000.0,
+            "value_protected_usd": 0.0,
             "time_remaining_to_act_minutes": 480,
         },
         {
@@ -56,7 +56,7 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
             "safe_temp_min_c": 0.0,
             "safe_temp_max_c": 4.0,
             "estimated_value_usd": 36500.0,
-            "value_protected_usd": 36500.0,
+            "value_protected_usd": 0.0,
             "time_remaining_to_act_minutes": 360,
         },
         {
@@ -78,7 +78,7 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
             "safe_temp_min_c": 2.0,
             "safe_temp_max_c": 6.0,
             "estimated_value_usd": 51000.0,
-            "value_protected_usd": 40800.0,
+            "value_protected_usd": 0.0,
             "time_remaining_to_act_minutes": 150,
         },
         {
@@ -100,17 +100,27 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
             "safe_temp_min_c": 0.0,
             "safe_temp_max_c": 2.0,
             "estimated_value_usd": 68000.0,
-            "value_protected_usd": 54400.0,
+            "value_protected_usd": 0.0,
             "time_remaining_to_act_minutes": 45,
         },
     ]
     shipments: list[DemoShipmentState] = []
     for index, spec in enumerate(specs):
         temperature = float(spec["temperature_c"])
+        age_offset = 80 if spec["shipment_id"] == "DEMO-1002" else 0
         history = [
-            TemperatureReadingPoint(recorded_at=now - timedelta(minutes=30), temperature_c=max(0.0, temperature - 0.8)),
-            TemperatureReadingPoint(recorded_at=now - timedelta(minutes=15), temperature_c=max(0.0, temperature - 0.3)),
-            TemperatureReadingPoint(recorded_at=now, temperature_c=temperature),
+            TemperatureReadingPoint(
+                recorded_at=now - timedelta(minutes=30 + age_offset),
+                temperature_c=max(0.0, temperature - 0.8),
+            ),
+            TemperatureReadingPoint(
+                recorded_at=now - timedelta(minutes=15 + age_offset),
+                temperature_c=max(0.0, temperature - 0.3),
+            ),
+            TemperatureReadingPoint(
+                recorded_at=now - timedelta(minutes=age_offset),
+                temperature_c=temperature,
+            ),
         ]
         risk = spec["risk_level"]
         shipments.append(
