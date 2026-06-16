@@ -18,6 +18,8 @@ def test_seeded_demo_scenario_is_deterministic_and_distinct():
     }
     assert all(shipment.crop.startswith("Fictional") for shipment in first)
     assert all(shipment.temperature_history for shipment in first)
+    assert {shipment.trailer_id for shipment in first} == {"TRL-DEMO-11", "TRL-DEMO-24"}
+    assert all(shipment.pallet_position in {1, 2} for shipment in first)
 
 
 def test_seeded_demo_scenario_maps_risk_to_expected_pallet_colors():

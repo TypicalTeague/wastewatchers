@@ -35,6 +35,9 @@ export interface DemoShipmentState {
   trailer_id: string;
   truck_id: string;
   pallet_id: string;
+  pallet_position: number;
+  trailer_pallet_capacity: number;
+  commodity_abbrev: string;
   crop: string;
   origin: string;
   planned_destination: string;
@@ -59,4 +62,8 @@ export interface DemoDashboardState {
   metrics: DemoMetrics;
   shipments: DemoShipmentState[];
   message: string;
+}
+
+export interface SimulationConfig {
+  interval_seconds: number;
 }

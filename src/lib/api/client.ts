@@ -1,4 +1,4 @@
-import type { DemoDashboardState } from "./types";
+import type { DemoDashboardState, SimulationConfig } from "./types";
 
 const API_BASE = "/api/wastewatchers";
 
@@ -43,4 +43,21 @@ export async function loadDemoScenario(): Promise<DemoDashboardState> {
 
 export async function resetDemoScenario(): Promise<DemoDashboardState> {
   return request<DemoDashboardState>("/demo/scenario/reset", { method: "POST" });
+}
+
+export async function startDemoSimulation(
+  config: SimulationConfig,
+): Promise<DemoDashboardState> {
+  return request<DemoDashboardState>("/demo/simulation/start", {
+    method: "POST",
+    body: JSON.stringify(config),
+  });
+}
+
+export async function pauseDemoSimulation(): Promise<DemoDashboardState> {
+  return request<DemoDashboardState>("/demo/simulation/pause", { method: "POST" });
+}
+
+export async function advanceDemoSimulationStep(): Promise<DemoDashboardState> {
+  return request<DemoDashboardState>("/demo/simulation/step", { method: "POST" });
 }

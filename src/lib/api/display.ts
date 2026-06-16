@@ -45,6 +45,16 @@ export function scenarioStatusLabel(status: DemoScenarioStatus): string {
   return labels[status];
 }
 
+export function simulationModeLabel(status: DemoScenarioStatus): string {
+  if (status === "running") {
+    return "Live simulation running";
+  }
+  if (status === "paused") {
+    return "Simulation paused — use Advance Step for manual updates";
+  }
+  return "Simulation ready";
+}
+
 export function palletConditionLabel(color: PalletColor): string {
   const labels: Record<PalletColor, string> = {
     green: "Stable condition",

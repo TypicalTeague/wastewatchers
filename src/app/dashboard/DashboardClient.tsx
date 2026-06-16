@@ -1,11 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ApiError,
+  advanceDemoSimulationStep,
   getDemoDashboard,
   loadDemoScenario,
+  pauseDemoSimulation,
   resetDemoScenario,
+  startDemoSimulation,
 } from "@/lib/api/client";
 import {
   actionWindowSummary,
@@ -18,7 +21,9 @@ import {
   sortShipmentsByRisk,
 } from "@/lib/api/display";
 import type { DemoDashboardState, DemoShipmentState } from "@/lib/api/types";
+import { shipmentsForTrailer } from "@/lib/api/trailer";
 import TrailerPalletVisualization from "./components/TrailerPalletVisualization";
+import SimulationControls from "./components/SimulationControls";
 
 type ViewState = "loading" | "unavailable" | "ready";
 
@@ -140,7 +145,15 @@ function ShipmentQueueItem({
   );
 }
 
-function ShipmentWorkspace({ shipment }: { shipment: DemoShipmentState }) {
+function ShipmentWorkspace({
+  shipment,
+  trailerShipments,
+  onSelectShipment,
+}: {
+  shipment: DemoShipmentState;
+  trailerShipments: DemoShipmentState[];
+  onSelectShipment: (shipmentId: string) => void;
+}) {
   const facts = [
     {
       icon: <TruckIcon className="h-5 w-5 text-zinc-600 dark:text-zinc-300" />,
@@ -155,7 +168,7 @@ function ShipmentWorkspace({ shipment }: { shipment: DemoShipmentState }) {
   ];
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <div>
         <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
           Selected shipment
@@ -168,7 +181,11 @@ function ShipmentWorkspace({ shipment }: { shipment: DemoShipmentState }) {
         </p>
       </div>
 
-      <TrailerPalletVisualization shipment={shipment} />
+      <TrailerPalletVisualization
+        trailerShipments={trailerShipments}
+        selectedShipmentId={shipment.shipment_id}
+        onSelectShipment={onSelectShipment}
+      />
 
       <div className="grid gap-3 sm:grid-cols-2">
         {facts.map((fact) => (
@@ -236,7 +253,25 @@ export default function DashboardClient() {
   const [dashboard, setDashboard] = useState<DemoDashboardState | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [actionPending, setActionPending] = useState(false);
+  const [simulationPending, setSimulationPending] = useState(false);
+  const [simulationIntervalSeconds, setSimulationIntervalSeconds] = useState(5);
   const [statusNote, setStatusNote] = useState<string | null>(null);
+  const simulationBusyRef = useRef(false);
+
+  const mergeDashboardState = useCallback((state: DemoDashboardState) => {
+    setDashboard(state);
+    setStatusNote(state.message);
+    if (!state.empty_state && state.shipments.length > 0) {
+      setSelectedId((current) => {
+        if (current && state.shipments.some((s) => s.shipment_id === current)) {
+          return current;
+        }
+        return sortShipmentsByRisk(state.shipments)[0]?.shipment_id ?? null;
+      });
+    } else {
+      setSelectedId(null);
+    }
+  }, []);
 
   const shipments = useMemo(
     () => (dashboard ? sortShipmentsByRisk(dashboard.shipments) : []),
@@ -247,6 +282,13 @@ export default function DashboardClient() {
     () => shipments.find((s) => s.shipment_id === selectedId) ?? null,
     [shipments, selectedId],
   );
+
+  const trailerShipments = useMemo(() => {
+    if (!selectedShipment || !dashboard) {
+      return [];
+    }
+    return shipmentsForTrailer(dashboard.shipments, selectedShipment.trailer_id);
+  }, [selectedShipment, dashboard]);
 
   const fetchDashboard = useCallback(async (options?: { showLoading?: boolean }) => {
     if (options?.showLoading !== false) {
@@ -313,16 +355,102 @@ export default function DashboardClient() {
     };
   }, []);
 
+  const scenarioStatus = dashboard?.scenario_status ?? "empty";
+  const scenarioEmpty = dashboard?.empty_state ?? true;
+
+  useEffect(() => {
+    if (scenarioStatus !== "running" || scenarioEmpty) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    const tick = async () => {
+      if (cancelled || simulationBusyRef.current) {
+        return;
+      }
+      simulationBusyRef.current = true;
+      try {
+        const state = await advanceDemoSimulationStep();
+        if (!cancelled) {
+          mergeDashboardState(state);
+        }
+      } catch {
+        if (cancelled) {
+          return;
+        }
+        setStatusNote("Simulation update failed. Live mode stopped.");
+        try {
+          const state = await pauseDemoSimulation();
+          mergeDashboardState(state);
+        } catch {
+          setDashboard((current) =>
+            current ? { ...current, scenario_status: "paused" } : current,
+          );
+        }
+      } finally {
+        simulationBusyRef.current = false;
+      }
+    };
+
+    const timerId = window.setInterval(() => {
+      void tick();
+    }, simulationIntervalSeconds * 1000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timerId);
+    };
+  }, [scenarioStatus, scenarioEmpty, simulationIntervalSeconds, mergeDashboardState]);
+
+  async function handleStartSimulation() {
+    setSimulationPending(true);
+    setStatusNote(null);
+    try {
+      const state = await startDemoSimulation({
+        interval_seconds: simulationIntervalSeconds,
+      });
+      mergeDashboardState(state);
+    } catch {
+      setStatusNote("Could not start live simulation.");
+    } finally {
+      setSimulationPending(false);
+    }
+  }
+
+  async function handlePauseSimulation() {
+    setSimulationPending(true);
+    setStatusNote(null);
+    try {
+      const state = await pauseDemoSimulation();
+      mergeDashboardState(state);
+    } catch {
+      setStatusNote("Could not pause simulation.");
+    } finally {
+      setSimulationPending(false);
+    }
+  }
+
+  async function handleAdvanceStep() {
+    setSimulationPending(true);
+    setStatusNote(null);
+    try {
+      const state = await advanceDemoSimulationStep();
+      mergeDashboardState(state);
+    } catch {
+      setStatusNote("Could not advance simulation step.");
+    } finally {
+      setSimulationPending(false);
+    }
+  }
+
   async function handleLoadScenario() {
     setActionPending(true);
     setStatusNote(null);
     try {
       const state = await loadDemoScenario();
-      setDashboard(state);
+      mergeDashboardState(state);
       setViewState("ready");
-      const ordered = sortShipmentsByRisk(state.shipments);
-      setSelectedId(ordered[0]?.shipment_id ?? null);
-      setStatusNote(state.message);
     } catch {
       setViewState("unavailable");
       setStatusNote("Could not load the demo scenario. Check that FastAPI is running.");
@@ -336,10 +464,8 @@ export default function DashboardClient() {
     setStatusNote(null);
     try {
       const state = await resetDemoScenario();
-      setDashboard(state);
+      mergeDashboardState(state);
       setViewState("ready");
-      setSelectedId(null);
-      setStatusNote(state.message);
     } catch {
       setViewState("unavailable");
       setStatusNote("Could not reset the demo scenario.");
@@ -419,7 +545,7 @@ export default function DashboardClient() {
   const empty = dashboard?.empty_state ?? true;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex flex-1 flex-col">
       <OperationsStatusBar
         scenarioStatus={dashboard?.scenario_status ?? "empty"}
         message={statusNote ?? dashboard?.message ?? ""}
@@ -430,6 +556,18 @@ export default function DashboardClient() {
         actionsDisabled={false}
         showReset={!empty}
       />
+
+      {!empty && dashboard && (
+        <SimulationControls
+          scenarioStatus={dashboard.scenario_status}
+          intervalSeconds={simulationIntervalSeconds}
+          onIntervalChange={setSimulationIntervalSeconds}
+          onStart={() => void handleStartSimulation()}
+          onPause={() => void handlePauseSimulation()}
+          onStep={() => void handleAdvanceStep()}
+          pending={simulationPending}
+        />
+      )}
 
       {empty ? (
         <div className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center p-6 text-center">
@@ -451,8 +589,9 @@ export default function DashboardClient() {
           </button>
         </div>
       ) : (
-        <div className="mx-auto grid min-h-0 w-full max-w-[1600px] flex-1 grid-cols-1 gap-4 p-4 lg:grid-cols-[240px_minmax(0,1fr)_260px] lg:grid-rows-[minmax(0,1fr)]">
-          <aside className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:max-h-[calc(100dvh-11rem)]">
+        <div className="mx-auto w-full max-w-[1600px] flex-1 p-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[240px_minmax(0,1fr)_260px] lg:items-start">
+          <aside className="flex flex-col rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-12rem)] lg:overflow-hidden">
             <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
               <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-200">
                 Shipment queue
@@ -473,15 +612,19 @@ export default function DashboardClient() {
             </div>
           </aside>
 
-          <section className="min-h-[320px] overflow-y-auto rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 lg:max-h-[calc(100dvh-11rem)] lg:p-5">
+          <section className="min-w-0 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 lg:p-5">
             {selectedShipment ? (
-              <ShipmentWorkspace shipment={selectedShipment} />
+              <ShipmentWorkspace
+                shipment={selectedShipment}
+                trailerShipments={trailerShipments}
+                onSelectShipment={setSelectedId}
+              />
             ) : (
               <p className="text-sm text-zinc-500">Select a shipment from the queue.</p>
             )}
           </section>
 
-          <aside className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/50 lg:max-h-[calc(100dvh-11rem)]">
+          <aside className="flex flex-col rounded-xl border border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/50 lg:sticky lg:top-4">
             <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
               <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-200">
                 Decision summary
@@ -511,6 +654,7 @@ export default function DashboardClient() {
               )}
             </div>
           </aside>
+          </div>
         </div>
       )}
     </div>

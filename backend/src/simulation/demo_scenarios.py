@@ -5,6 +5,7 @@ from datetime import timedelta
 from backend.src.models.common import utc_now
 from backend.src.models.demo import DemoRiskLevel, DemoShipmentState, TemperatureReadingPoint
 from backend.src.simulation.pallet_state import pallet_color_for_risk
+from backend.src.simulation.trailer_layout import validate_trailer_pallet_layout
 
 
 SCENARIO_ID = "hackathon-main"
@@ -19,6 +20,9 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
             "trailer_id": "TRL-DEMO-11",
             "truck_id": "TRK-204",
             "pallet_id": "PAL-STRAW-01",
+            "pallet_position": 1,
+            "trailer_pallet_capacity": 4,
+            "commodity_abbrev": "STRAW",
             "crop": "Fictional Salinas Strawberries",
             "origin": "Demo Salinas Cooling Yard",
             "planned_destination": "Fresno Demo Distribution Center",
@@ -35,9 +39,12 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
         },
         {
             "shipment_id": "DEMO-1002",
-            "trailer_id": "TRL-DEMO-18",
-            "truck_id": "TRK-317",
+            "trailer_id": "TRL-DEMO-11",
+            "truck_id": "TRK-204",
             "pallet_id": "PAL-LEAF-02",
+            "pallet_position": 2,
+            "trailer_pallet_capacity": 4,
+            "commodity_abbrev": "LEAF",
             "crop": "Fictional Yuma Romaine",
             "origin": "Demo Yuma Packing Shed",
             "planned_destination": "Bakersfield Demo Warehouse",
@@ -57,6 +64,9 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
             "trailer_id": "TRL-DEMO-24",
             "truck_id": "TRK-419",
             "pallet_id": "PAL-MELON-03",
+            "pallet_position": 1,
+            "trailer_pallet_capacity": 4,
+            "commodity_abbrev": "MELON",
             "crop": "Fictional Imperial Melons",
             "origin": "Demo Imperial Valley Farm",
             "planned_destination": "Sacramento Demo Market",
@@ -73,9 +83,12 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
         },
         {
             "shipment_id": "DEMO-1004",
-            "trailer_id": "TRL-DEMO-39",
-            "truck_id": "TRK-512",
+            "trailer_id": "TRL-DEMO-24",
+            "truck_id": "TRK-419",
             "pallet_id": "PAL-BERRY-04",
+            "pallet_position": 2,
+            "trailer_pallet_capacity": 4,
+            "commodity_abbrev": "BERRY",
             "crop": "Fictional Coastal Blueberries",
             "origin": "Demo Watsonville Cold Dock",
             "planned_destination": "Oakland Demo Grocery Hub",
@@ -108,4 +121,5 @@ def seeded_demo_shipments() -> list[DemoShipmentState]:
                 confirmation_message=f"Demo shipment {index + 1} loaded.",
             )
         )
+    validate_trailer_pallet_layout(shipments)
     return shipments

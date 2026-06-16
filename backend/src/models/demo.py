@@ -80,6 +80,9 @@ class DemoShipmentState(BaseModel):
     trailer_id: str = Field(min_length=1)
     truck_id: str = Field(min_length=1)
     pallet_id: str = Field(min_length=1)
+    pallet_position: Annotated[int, Field(ge=1, le=8)] = 1
+    trailer_pallet_capacity: Annotated[int, Field(ge=1, le=8)] = 4
+    commodity_abbrev: str = Field(min_length=1, max_length=12, default="CARGO")
     crop: str = Field(min_length=1)
     origin: str = Field(min_length=1)
     planned_destination: str = Field(min_length=1)
