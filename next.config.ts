@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const apiOrigin =
-  process.env.WASTEWATCHERS_API_ORIGIN ?? "http://127.0.0.1:8000";
+  process.env.WASTEWATCHERS_API_ORIGIN ?? "https://wastewatcher.onrender.com";
 
 const nextConfig: NextConfig = {
   async rewrites() {

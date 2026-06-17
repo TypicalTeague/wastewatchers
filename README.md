@@ -97,6 +97,7 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+By default, Next.js rewrites API requests to [https://wastewatcher.onrender.com](https://wastewatcher.onrender.com). Set `WASTEWATCHERS_API_ORIGIN` in `.env.local` to override (for example, `http://127.0.0.1:8000` when running FastAPI locally).
 
 #### Backend (FastAPI)
 
