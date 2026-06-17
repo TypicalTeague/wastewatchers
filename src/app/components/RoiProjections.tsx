@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Cite } from './Footnotes'
 
 const MIN_YEARS = 1
 const MAX_YEARS = 10
@@ -9,18 +10,18 @@ const AUTOPLAY_INTERVAL_MS = 1_500
 
 // Linear growth per year (baseline values)
 const PER_YEAR = {
-  tonsDiverted: 480,
-  landFillFeesAvoided: 72_000,
-  claimsPreCompiled: 1_150,
-  taxWriteOffsEnabled: 115_000,
+  foodSavedTons: 907_372,
+  inventoryRecovered: 15_200_000_000,
+  emissionsAvoided: 13_300_000,
+  annualTrackingCost: 198_000_000,
 }
 
 function project(years: number) {
   return {
-    tonsDiverted: PER_YEAR.tonsDiverted * years,
-    landFillFeesAvoided: PER_YEAR.landFillFeesAvoided * years,
-    claimsPreCompiled: PER_YEAR.claimsPreCompiled * years,
-    taxWriteOffsEnabled: PER_YEAR.taxWriteOffsEnabled * years,
+    foodSavedTons: PER_YEAR.foodSavedTons * years,
+    inventoryRecovered: PER_YEAR.inventoryRecovered * years,
+    emissionsAvoided: PER_YEAR.emissionsAvoided * years,
+    trackingCost: PER_YEAR.annualTrackingCost * years,
   }
 }
 
@@ -29,6 +30,12 @@ function formatNumber(n: number) {
 }
 
 function formatCurrency(n: number) {
+  if (n >= 1_000_000_000) {
+    return '$' + (n / 1_000_000_000).toFixed(1) + 'B'
+  }
+  if (n >= 1_000_000) {
+    return '$' + (n / 1_000_000).toFixed(1) + 'M'
+  }
   return '$' + n.toLocaleString('en-US')
 }
 
@@ -116,8 +123,8 @@ export default function RoiProjections() {
           in the market look like?
         </h2>
         <p className="max-w-lg text-base text-zinc-500 dark:text-zinc-400">
-          Drag the slider to explore projected impact over time. Based on
-          linear growth modelling across active WasteWatcher deployments.
+          Drag the slider to explore a nationwide scenario using annual
+          projections from the cold-chain assessment.
         </p>
       </div>
 
@@ -174,33 +181,37 @@ export default function RoiProjections() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <KpiCard
           icon="♻️"
-          label="Tons Diverted"
-          value={formatNumber(kpis.tonsDiverted) + ' t'}
-          description={`Projected waste diverted from landfill over ${years} yr${years !== 1 ? 's' : ''}`}
+          label="Fresh Food Preserved"
+          value={formatNumber(kpis.foodSavedTons) + ' tons'}
+          description={`Projected annualized diversion over ${years} yr${years !== 1 ? 's' : ''} at full-sector scale.`}
         />
         <KpiCard
           icon="💰"
-          label="Landfill Fees Avoided"
-          value={formatCurrency(kpis.landFillFeesAvoided)}
-          description={`Projected disposal cost savings over ${years} yr${years !== 1 ? 's' : ''}`}
+          label="Inventory Value Recovered"
+          value={formatCurrency(kpis.inventoryRecovered)}
+          description={`Modeled from 16B pounds of temperature-linked waste and a 38% spoilage reduction.`}
         />
         <KpiCard
-          icon="📋"
-          label="Claims Pre-Compiled"
-          value={formatNumber(kpis.claimsPreCompiled)}
-          description={`Projected compliance claims auto-compiled over ${years} yr${years !== 1 ? 's' : ''}`}
+          icon="🌍"
+          label="Emissions Avoided"
+          value={formatNumber(kpis.emissionsAvoided) + ' MTCO2e'}
+          description={`Estimated greenhouse gas avoidance over ${years} yr${years !== 1 ? 's' : ''} when dynamic tracking scales.`}
         />
         <KpiCard
-          icon="🧾"
-          label="Tax Write-Offs Enabled"
-          value={formatCurrency(kpis.taxWriteOffsEnabled)}
-          description={`Projected deductible value unlocked over ${years} yr${years !== 1 ? 's' : ''}`}
+          icon="📡"
+          label="Tracking Spend (OpEx)"
+          value={formatCurrency(kpis.trackingCost)}
+          description={`Upper-bound SaaS operating cost over ${years} yr${years !== 1 ? 's' : ''} for 500,000 reefers.`}
         />
       </div>
 
       <p className="text-xs text-zinc-400 dark:text-zinc-600">
-        Projections are estimates based on linear growth modelling. Actual
-        results may vary based on deployment scale and operational context.
+        Inputs reference Sources 3, 33, 34, 45, and 50. ROI implies roughly
+        $76.77 recovered per $1 of annual tracking spend in the modeled scenario
+        <Cite id={33} />
+        <Cite id={34} />
+        <Cite id={45} />
+        <Cite id={50} />.
       </p>
     </section>
   )

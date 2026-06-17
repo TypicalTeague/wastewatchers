@@ -1,11 +1,74 @@
 import Link from "next/link";
+import Footnotes, { Cite } from "./components/Footnotes";
 import RoiProjections from "./components/RoiProjections";
 
 const SOCIAL_PROOF = [
-  { value: "340+", label: "Enterprise clients" },
-  { value: "98k t", label: "Waste diverted" },
-  { value: "$22M+", label: "Fees avoided" },
-  { value: "99.4%", label: "Compliance rate" },
+  {
+    value: "31%",
+    label: "U.S. food supply goes unsold or uneaten annually",
+    source: 1,
+  },
+  {
+    value: "16B lbs",
+    label: "Food retailers discard each year from temperature failures",
+    source: 3,
+  },
+  {
+    value: "58%",
+    label: "Share of fugitive landfill methane linked to food waste",
+    source: 16,
+  },
+  {
+    value: "38%",
+    label: "Average spoilage-cost reduction with real-time IoT monitoring",
+    source: 33,
+  },
+];
+
+const SOURCES = [
+  {
+    id: 1,
+    title: "ReFED US Food Waste Report 2025",
+    href: "https://refed.org/downloads/refed-us-food-waste-report-2025.pdf",
+  },
+  {
+    id: 3,
+    title:
+      "Cold Chain Logistics Shipping Guide: Protect Product & Margin | Worldwide Express",
+    href: "https://www.wwex.com/shipping-resources/cold-chain-logistics",
+  },
+  {
+    id: 8,
+    title: "The 2026 ReFED U.S. Food Waste Report",
+    href: "https://refed.org/food-waste/refed-us-food-waste-report-2026/",
+  },
+  {
+    id: 16,
+    title: "Quantifying Methane Emissions from Landfilled Food Waste | US EPA",
+    href: "https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste",
+  },
+  {
+    id: 33,
+    title:
+      "(PDF) Smart Shelf Life: How IoT Sensors Cut Food Waste by 38% While Boosting Perishable Profits",
+    href: "https://www.researchgate.net/publication/396736476_Smart_Shelf_Life_How_IoT_Sensors_Cut_Food_Waste_by_38_While_Boosting_Perishable_Profits",
+  },
+  {
+    id: 34,
+    title: "Three Ways AI Is Driving Reductions in Food Loss and Waste - ReFED",
+    href: "https://refed.org/articles/three-ways-ai-is-driving-reductions-in-food-loss-and-waste/",
+  },
+  {
+    id: 45,
+    title:
+      "Samsara Review: Fleet Management Features, Fees, Support 2026 - Tech.co",
+    href: "https://tech.co/fleet-management/samsara-fleet-management-review",
+  },
+  {
+    id: 50,
+    title: "A ROADMAP TO REDUCE U.S. FOOD WASTE BY 20 PERCENT - ReFED",
+    href: "https://refed.org/downloads/Key_Insights.pdf",
+  },
 ];
 
 export default function Home() {
@@ -19,15 +82,17 @@ export default function Home() {
             Waste Compliance Intelligence
           </span>
           <h1 className="mx-auto mt-6 max-w-3xl text-5xl font-extrabold leading-tight tracking-tight text-zinc-900 dark:text-zinc-50 md:text-6xl">
-            Turn waste into a{" "}
+            Stop cold-chain loss before it becomes{" "}
             <span className="text-emerald-600 dark:text-emerald-400">
-              competitive advantage
+              landfill methane
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
-            WasteWatcher automates compliance tracking, compiles claims, and
-            unlocks tax write-offs — so your sustainability team spends less
-            time on paperwork and more time driving impact.
+            In the U.S., roughly 31% of food goes unsold or uneaten
+            <Cite id={1} />, and $380 billion in surplus food value is lost
+            annually
+            <Cite id={8} />. WasteWatcher helps operators detect transit risk
+            sooner, salvage more inventory, and reduce landfill-bound spoilage.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
@@ -49,7 +114,7 @@ export default function Home() {
       {/* Social proof strip */}
       <section className="border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
         <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-y divide-zinc-200 px-6 dark:divide-zinc-800 md:grid-cols-4 md:divide-y-0">
-          {SOCIAL_PROOF.map(({ value, label }) => (
+          {SOCIAL_PROOF.map(({ value, label, source }) => (
             <div
               key={label}
               className="flex flex-col items-center gap-1 px-6 py-8 text-center"
@@ -59,6 +124,7 @@ export default function Home() {
               </span>
               <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 {label}
+                <Cite id={source} />
               </span>
             </div>
           ))}
@@ -69,6 +135,8 @@ export default function Home() {
       <section className="mx-auto w-full max-w-6xl px-6 py-24">
         <RoiProjections />
       </section>
+
+      <Footnotes entries={SOURCES} />
 
       {/* CTA Banner */}
       <section className="bg-emerald-600 dark:bg-emerald-700">
