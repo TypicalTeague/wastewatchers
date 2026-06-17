@@ -66,11 +66,11 @@ export default function TrailerPalletVisualization({
   return (
     <div className="rounded-2xl border border-zinc-200 bg-gradient-to-br from-slate-50 via-white to-zinc-100 shadow-sm transition-all duration-500 ease-out dark:border-zinc-700 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-950">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200/80 bg-zinc-900 px-4 py-3 dark:border-zinc-700">
-        <div>
+        <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400">
             Reefer interior · top-down
           </p>
-          <p className="text-sm font-medium text-zinc-300">
+          <p className="truncate text-sm font-medium text-zinc-300">
             {anchor.truck_id} · {anchor.trailer_id}
           </p>
           <p className="text-xs text-zinc-400">
@@ -78,7 +78,7 @@ export default function TrailerPalletVisualization({
           </p>
         </div>
         <span
-          className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-bold ${riskBadgeClasses(selectedShipment.risk_level)}`}
+          className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold sm:text-sm ${riskBadgeClasses(selectedShipment.risk_level)}`}
         >
           {isCritical && (
             <span className="relative flex h-2 w-2">
