@@ -90,8 +90,8 @@ export default function SimulationControls({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+          <label className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 sm:w-auto sm:justify-start">
             <span className="text-zinc-500 dark:text-zinc-400">Every</span>
             <input
               type="number"
@@ -115,7 +115,7 @@ export default function SimulationControls({
             type="button"
             disabled={pending || isRunning}
             onClick={onStart}
-            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             <PlayIcon className="h-3.5 w-3.5" />
             Start live
@@ -125,7 +125,7 @@ export default function SimulationControls({
             type="button"
             disabled={pending || !isRunning}
             onClick={onPause}
-            className="inline-flex items-center gap-1.5 rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:w-auto"
           >
             <PauseIcon className="h-3.5 w-3.5" />
             Pause
@@ -135,7 +135,7 @@ export default function SimulationControls({
             type="button"
             disabled={pending || isRunning}
             onClick={onStep}
-            className="inline-flex items-center gap-1.5 rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:w-auto"
           >
             <StepIcon className="h-4 w-4" />
             Advance step

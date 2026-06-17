@@ -174,7 +174,7 @@ function ShipmentWorkspace({
             </p>
           </div>
           {selectedFinancial && (
-            <div className="shrink-0 rounded-lg border border-emerald-300/70 bg-white/70 p-3 text-left dark:border-emerald-800 dark:bg-zinc-950/30">
+            <div className="w-full rounded-lg border border-emerald-300/70 bg-white/70 p-3 text-left dark:border-emerald-800 dark:bg-zinc-950/30 sm:w-auto sm:shrink-0">
               <p className="text-xs font-semibold text-emerald-900 dark:text-emerald-200">{estimatedNetValueLabel()}</p>
               <p className="mt-1 text-2xl font-bold text-emerald-950 dark:text-emerald-50">
                 {formatCurrency(selectedFinancial.estimated_net_value_preserved_usd)}
@@ -197,7 +197,7 @@ function ShipmentWorkspace({
               type="button"
               disabled={decisionPending || !recommendation}
               onClick={() => onDecision("approve_reroute", recommendedOption)}
-              className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               Approve
             </button>
@@ -205,7 +205,7 @@ function ShipmentWorkspace({
               type="button"
               disabled={decisionPending}
               onClick={() => onDecision("send_manual_review", recommendedOption)}
-              className="rounded-full border border-emerald-700 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 disabled:opacity-50 dark:text-emerald-200 dark:hover:bg-emerald-950"
+              className="w-full rounded-full border border-emerald-700 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 disabled:opacity-50 dark:text-emerald-200 dark:hover:bg-emerald-950 sm:w-auto"
             >
               Manual review
             </button>
@@ -213,7 +213,7 @@ function ShipmentWorkspace({
               type="button"
               disabled={decisionPending}
               onClick={() => onDecision("reject_shipment", recommendedOption)}
-              className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              className="w-full rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:w-auto"
             >
               Reject
             </button>
@@ -262,7 +262,29 @@ function ShipmentWorkspace({
 
       <section className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Compare Response Options</h3>
-        <div className="mt-3 overflow-x-auto">
+        <div className="mt-3 space-y-3 md:hidden">
+          {shipment.response_options.map((option) => (
+            <article key={option.option_id} className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-800">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-medium text-zinc-900 dark:text-zinc-100">{option.destination_name}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">{option.expected_condition_at_arrival}</p>
+                </div>
+                <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium dark:bg-zinc-800">
+                  {optionViabilityLabel(option.viability)}
+                </span>
+              </div>
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                <Metric label="Travel" value={formatMinutes(option.travel_time_minutes)} />
+                <Metric label="Acceptance" value={formatPercent(option.acceptance_percent)} />
+                <Metric label="Net preserved" value={formatCurrency(option.financial_breakdown.estimated_net_value_preserved_usd)} />
+                <Metric label="Risk" value={option.operational_risk} />
+              </dl>
+              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">{option.viability_reason}</p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-3 hidden overflow-x-auto md:block">
           <table className="min-w-full text-left text-sm">
             <thead className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               <tr>
@@ -600,9 +622,9 @@ export default function DashboardClient() {
           <h2 className="mt-4 text-2xl font-bold text-zinc-900 dark:text-zinc-50">Operations backend unavailable</h2>
           <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
             The dashboard could not reach FastAPI. Start the API with{" "}
-            <code className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-800">uvicorn backend.src.main:app --reload</code>{" "}
+            <code className="break-all rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-800">uvicorn backend.src.main:app --reload</code>{" "}
             and confirm{" "}
-            <code className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-800">WASTEWATCHERS_API_ORIGIN</code>{" "}
+            <code className="break-all rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-800">WASTEWATCHERS_API_ORIGIN</code>{" "}
             in your local environment.
           </p>
           <button type="button" onClick={() => void fetchDashboard()} className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
@@ -709,16 +731,16 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</dt>
-      <dd className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">{value}</dd>
+      <dd className="mt-1 break-words text-sm font-semibold text-zinc-900 dark:text-zinc-100">{value}</dd>
     </div>
   );
 }
 
 function MetricRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex gap-3">
-      <dt className="min-w-32 text-zinc-500 dark:text-zinc-400">{label}</dt>
-      <dd className="min-w-0 flex-1 font-medium text-zinc-900 dark:text-zinc-100">{value}</dd>
+    <div className="flex flex-col gap-1 sm:flex-row sm:gap-3">
+      <dt className="text-xs text-zinc-500 dark:text-zinc-400 sm:min-w-32 sm:text-sm">{label}</dt>
+      <dd className="min-w-0 flex-1 break-words font-medium text-zinc-900 dark:text-zinc-100">{value}</dd>
     </div>
   );
 }
@@ -761,14 +783,14 @@ function OperationsStatusBar({
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">WasteWatchers Operations</p>
             <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Logistics Control Center</h1>
-            <p className="truncate text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="line-clamp-2 text-sm text-zinc-500 dark:text-zinc-400 sm:truncate sm:line-clamp-1">
               {scenarioStatusLabel(scenarioStatus)}
               {message ? ` - ${message}` : ""}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
           {metrics && (
             <div className="mr-2 hidden items-center gap-4 text-xs text-zinc-600 dark:text-zinc-300 md:flex">
               <span><strong className="text-zinc-900 dark:text-zinc-50">{metrics.critical_shipments}</strong> critical</span>
@@ -776,16 +798,23 @@ function OperationsStatusBar({
               <span><strong className="text-zinc-900 dark:text-zinc-50">{formatCurrency(metrics.estimated_net_value_preserved_usd)}</strong> net preserved</span>
             </div>
           )}
-          <button type="button" disabled={actionsDisabled || actionPending} onClick={onLoad} className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50">
+          <button type="button" disabled={actionsDisabled || actionPending} onClick={onLoad} className="w-full rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
             Load Demo Scenario
           </button>
           {showReset && (
-            <button type="button" disabled={actionsDisabled || actionPending} onClick={onReset} className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800">
+            <button type="button" disabled={actionsDisabled || actionPending} onClick={onReset} className="w-full rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800 sm:w-auto">
               Reset Scenario
             </button>
           )}
         </div>
       </div>
+      {metrics && (
+        <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-1 px-4 pb-3 text-xs text-zinc-600 dark:text-zinc-300 md:hidden">
+          <span><strong className="text-zinc-900 dark:text-zinc-50">{metrics.critical_shipments}</strong> critical shipments</span>
+          <span><strong className="text-zinc-900 dark:text-zinc-50">{metrics.at_risk_shipments}</strong> at-risk shipments</span>
+          <span><strong className="text-zinc-900 dark:text-zinc-50">{formatCurrency(metrics.estimated_net_value_preserved_usd)}</strong> estimated net preserved</span>
+        </div>
+      )}
     </header>
   );
 }
