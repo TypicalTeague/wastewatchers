@@ -1,65 +1,158 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import Footnotes, { Cite } from "../components/Footnotes";
 
 export const metadata: Metadata = {
   title: "About — WasteWatcher",
   description:
-    "Learn how WasteWatcher was founded and the team behind the platform.",
+    "Learn how WasteWatcher uses evidence-based cold-chain data to reduce food loss, emissions, and avoidable write-offs.",
 };
 
 const STATS = [
-  { value: "2019", label: "Founded" },
-  { value: "340+", label: "Enterprise clients" },
-  { value: "18", label: "Countries served" },
-  { value: "62", label: "Team members" },
+  {
+    value: "$380B",
+    label: "U.S. surplus food value in 2024",
+    source: 8,
+  },
+  {
+    value: "500k",
+    label: "Active refrigerated trailers in the U.S. fleet",
+    source: 25,
+  },
+  {
+    value: "55M",
+    label: "Metric tons CO2e from annual U.S. food landfill emissions",
+    source: 17,
+  },
+  { value: "3.65 yrs", label: "Food-waste landfill methane half-life", source: 18 },
 ];
 
-const TEAM = [
+const EVIDENCE_AREAS = [
   {
-    name: "Sofia Reyes",
-    role: "Co-founder & CEO",
-    bio: "Former sustainability director at a Fortune 500 logistics firm. Sofia built WasteWatcher after spending a decade wrestling with manual compliance spreadsheets.",
-    initials: "SR",
-    color: "bg-violet-500",
+    title: "Food loss and economics",
+    body: "We anchor opportunity sizing to ReFED data on U.S. surplus food value, per-capita waste, and system-level investment returns.",
+    source: "ReFED reports and roadmap",
+    citation: 8,
   },
   {
-    name: "Marcus Tran",
-    role: "Co-founder & CTO",
-    bio: "Ex-Google engineer specialising in data pipelines and regulatory automation. Marcus architected WasteWatcher's real-time compliance engine.",
-    initials: "MT",
-    color: "bg-sky-500",
+    title: "Landfill methane kinetics",
+    body: "We model environmental risk with EPA methane kinetics and capture-lag findings so avoided waste translates to avoided emissions.",
+    source: "U.S. EPA methane studies",
+    citation: 16,
   },
   {
-    name: "Aisha Okafor",
-    role: "Head of Customer Success",
-    bio: "Helps enterprise clients turn onboarding into ROI within 90 days. Former ESG consultant with 12 years of client-side experience.",
-    initials: "AO",
-    color: "bg-amber-500",
+    title: "Transit refrigeration operations",
+    body: "We prioritize the transport stage where failure rates, loading mistakes, and dwell-time delays drive avoidable spoilage events.",
+    source: "Cold-chain operational analyses",
+    citation: 3,
   },
   {
-    name: "Daniel Park",
-    role: "Head of Product",
-    bio: "Product leader with a background in SaaS compliance tooling. Daniel drives the roadmap with a relentless focus on reducing time-to-insight.",
-    initials: "DP",
-    color: "bg-rose-500",
+    title: "IoT mitigation outcomes",
+    body: "We validate intervention impact with studies showing 38% spoilage-cost reduction and measurable emissions and cost savings at scale.",
+    source: "IoT shelf-life and AI deployment evidence",
+    citation: 33,
   },
 ];
 
-const VALUES = [
+const AUTHORS = [
+  {
+    name: "Abraham Guerrero",
+    linkedin: "https://www.linkedin.com/in/abrahamdguerrero/",
+    github: "https://github.com/AbeGue02",
+    githubHandle: "AbeGue02",
+    responsibility: "System Design & Software Development",
+    blurb:
+      "Leads system architecture and core implementation across telemetry ingestion, risk logic, and product integration.",
+    photoUrl: "",
+  },
+  {
+    name: "Andre Teague",
+    linkedin: "https://www.linkedin.com/in/andreteaguejr/",
+    github: "https://github.com/TypicalTeague",
+    githubHandle: "TypicalTeague",
+    responsibility: "Data Research & Software Development",
+    blurb:
+      "Owns research synthesis and contributes to software implementation that connects findings to product workflows.",
+    photoUrl: "",
+  },
+  {
+    name: "Niya Neblett",
+    linkedin: "https://www.linkedin.com/in/niya-neblett/",
+    github: "https://github.com/niyaneb",
+    githubHandle: "niyaneb",
+    responsibility: "Project Management & Research",
+    blurb:
+      "Coordinates project execution and research direction to keep delivery, scope, and evidence aligned.",
+    photoUrl: "",
+  },
+  {
+    name: "Isaac Johnson",
+    linkedin: "https://www.linkedin.com/in/isaac-johnson-07202218b",
+    github: "",
+    githubHandle: "",
+    responsibility: "Brand Identity & Marketing",
+    blurb:
+      "Shapes product narrative, visual identity, and go-to-market messaging for stakeholder-facing communication.",
+    photoUrl: "",
+  },
+];
+
+const PRINCIPLES = [
   {
     icon: "🔍",
-    title: "Radical Transparency",
-    body: "Every data point we surface is traceable to source. We believe auditable clarity is the foundation of trust.",
+    title: "Traceable Claims",
+    body: "Every KPI we publish ties back to a publicly available source and is presented with explicit citation on-page.",
   },
   {
-    icon: "⚡",
-    title: "Speed to Compliance",
-    body: "Regulatory deadlines don't wait. We design for urgency — so your team always files on time, every time.",
+    icon: "🧪",
+    title: "Operational Realism",
+    body: "We focus on constraints that actually break cold chains: maintenance gaps, warm loading, dwell delays, and sensor blind spots.",
   },
   {
-    icon: "🌱",
-    title: "Impact at Scale",
-    body: "Individual actions matter. But systemic change requires enterprise-grade tools that make doing the right thing the easiest path.",
+    icon: "📉",
+    title: "Financial Accountability",
+    body: "We frame sustainability changes in dollars recovered, spoilage reduced, and implementation cost so decisions are investable.",
+  },
+];
+
+const SOURCES = [
+  {
+    id: 3,
+    title:
+      "Cold Chain Logistics Shipping Guide: Protect Product & Margin | Worldwide Express",
+    href: "https://www.wwex.com/shipping-resources/cold-chain-logistics",
+  },
+  {
+    id: 8,
+    title: "The 2026 ReFED U.S. Food Waste Report",
+    href: "https://refed.org/food-waste/refed-us-food-waste-report-2026/",
+  },
+  {
+    id: 16,
+    title: "Quantifying Methane Emissions from Landfilled Food Waste | US EPA",
+    href: "https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste",
+  },
+  {
+    id: 17,
+    title: "Food Waste and Methane: What's the Connection? - EPA",
+    href: "https://www.epa.gov/system/files/documents/2024-06/epa_usda_methane_and_food_waste_fact_sheet.pdf",
+  },
+  {
+    id: 18,
+    title: "Quantifying Methane Emissions from Landfilled Food Waste - EPA",
+    href: "https://www.epa.gov/system/files/documents/2023-10/food-waste-landfill-methane-10-8-23-final_508-compliant.pdf",
+  },
+  {
+    id: 25,
+    title: "Maximize Gains with Refrigerated Truck Trailers - Ryder",
+    href: "https://www.ryder.com/en-us/insights/blogs/fleet/refrigerated-truck-trailers-guide",
+  },
+  {
+    id: 33,
+    title:
+      "(PDF) Smart Shelf Life: How IoT Sensors Cut Food Waste by 38% While Boosting Perishable Profits",
+    href: "https://www.researchgate.net/publication/396736476_Smart_Shelf_Life_How_IoT_Sensors_Cut_Food_Waste_by_38_While_Boosting_Perishable_Profits",
   },
 ];
 
@@ -75,17 +168,19 @@ export default function AboutPage() {
               Our Story
             </span>
             <h1 className="mt-6 text-5xl font-extrabold leading-tight tracking-tight text-zinc-900 dark:text-zinc-50">
-              Built by operators,{" "}
+              Built on evidence,{" "}
               <span className="text-emerald-600 dark:text-emerald-400">
-                for operators
+                not assumptions
               </span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
-              WasteWatcher started with a simple frustration: compliance teams
-              at large enterprises were spending hundreds of hours per year
-              manually reconciling waste manifests, compiling claims, and
-              chasing contractors for documentation. We built the platform we
-              wished we had.
+              Our product strategy is grounded in published cold-chain,
+              methane, and food-waste economics research. Midstream logistics
+              failures drive a disproportionate share of loss and climate
+              impact
+              <Cite id={3} />
+              <Cite id={16} />, so we focus on interventions that are measurable
+              in both dollars and emissions.
             </p>
           </div>
         </div>
@@ -94,7 +189,7 @@ export default function AboutPage() {
       {/* Stats bar */}
       <section className="border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
         <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-y divide-zinc-200 px-6 dark:divide-zinc-800 md:grid-cols-4 md:divide-y-0">
-          {STATS.map(({ value, label }) => (
+          {STATS.map(({ value, label, source }) => (
             <div
               key={label}
               className="flex flex-col items-center gap-1 px-6 py-8 text-center"
@@ -104,6 +199,7 @@ export default function AboutPage() {
               </span>
               <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 {label}
+                <Cite id={source} />
               </span>
             </div>
           ))}
@@ -117,11 +213,11 @@ export default function AboutPage() {
             What we stand for
           </p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Our values
+            Our research principles
           </h2>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
-          {VALUES.map(({ icon, title, body }) => (
+          {PRINCIPLES.map(({ icon, title, body }) => (
             <div
               key={title}
               className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
@@ -143,37 +239,121 @@ export default function AboutPage() {
         <div className="mx-auto w-full max-w-6xl px-6 py-24">
           <div className="mb-12">
             <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-              The people behind the platform
+              How we structure the evidence
             </p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Leadership team
+              Evidence base
             </h2>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {TEAM.map(({ name, role, bio, initials, color }) => (
+            {EVIDENCE_AREAS.map(({ title, body, source, citation }) => (
               <div
-                key={name}
+                key={title}
                 className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
               >
-                <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-full ${color} text-sm font-bold text-white`}
-                >
-                  {initials}
-                </div>
                 <div>
                   <p className="font-bold text-zinc-900 dark:text-zinc-50">
-                    {name}
+                    {title}
                   </p>
                   <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                    {role}
+                    {source}
+                    <Cite id={citation} />
                   </p>
                 </div>
                 <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                  {bio}
+                  {body}
                 </p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-6 py-24">
+        <div className="mb-12">
+          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+            Product authors
+          </p>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Built by this team
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">
+            Names link directly to LinkedIn profiles. LinkedIn profile photos
+            are shown when publicly fetchable; otherwise a monogram is used.
+          </p>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {AUTHORS.map(
+            ({
+              name,
+              linkedin,
+              github,
+              githubHandle,
+              responsibility,
+              blurb,
+              photoUrl,
+            }) => {
+              const initials = name
+                .split(" ")
+                .map((part) => part[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase();
+
+              return (
+                <article
+                  key={name}
+                  className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  {photoUrl ? (
+                    <Image
+                      src={photoUrl}
+                      alt={`${name} profile`}
+                      width={64}
+                      height={64}
+                      unoptimized
+                      className="h-16 w-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-base font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                      {initials}
+                    </div>
+                  )}
+
+                  <div>
+                    <a
+                      href={linkedin}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-bold text-zinc-900 underline decoration-emerald-500 underline-offset-4 hover:text-emerald-700 dark:text-zinc-50 dark:hover:text-emerald-300"
+                    >
+                      {name}
+                    </a>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      {responsibility}
+                    </p>
+                    {github && githubHandle ? (
+                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                        GitHub:{" "}
+                        <a
+                          href={github}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline hover:text-zinc-800 dark:hover:text-zinc-200"
+                        >
+                          @{githubHandle}
+                        </a>
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                    {blurb}
+                  </p>
+                </article>
+              );
+            }
+          )}
         </div>
       </section>
 
@@ -182,11 +362,11 @@ export default function AboutPage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 py-16 text-center md:flex-row md:text-left">
           <div>
             <h2 className="text-2xl font-bold text-white">
-              Want to join our mission?
+              Need a data-backed waste strategy?
             </h2>
             <p className="mt-2 text-emerald-100">
-              We&apos;re always looking for people who care about the planet
-              and love building great software.
+              Talk with us about how these findings translate into your
+              network-level implementation plan.
             </p>
           </div>
           <Link
@@ -197,6 +377,8 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
+
+      <Footnotes entries={SOURCES} />
     </>
   );
 }

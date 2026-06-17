@@ -1,78 +1,117 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Footnotes, { Cite } from "../components/Footnotes";
 
 export const metadata: Metadata = {
   title: "Mission — WasteWatcher",
   description:
-    "WasteWatcher's mission: eliminate waste compliance friction for enterprises and accelerate the global transition to a circular economy.",
+    "WasteWatcher's mission: cut cold-chain spoilage, avoid landfill methane, and deliver measurable ROI through real-time intervention.",
 };
 
 const PILLARS = [
   {
     number: "01",
-    icon: "♻️",
-    title: "Divert",
-    headline: "Keep materials out of landfill",
-    body: "Our platform tracks every waste stream in real time — giving your operations team the visibility to redirect materials to recycling, composting, or energy-recovery partners before they ever reach a landfill gate.",
-    stat: "98,000 t",
-    statLabel: "diverted to date",
+    icon: "📡",
+    title: "Detect",
+    headline: "Surface risk before a load fails",
+    body: "Dock-side visual checks detect only 46% of excursions, while continuous monitoring can detect 97%, shrinking blind spots and enabling intervention before rejection.",
+    stat: "97%",
+    statLabel: "excursion detection coverage",
+    citation: 4,
   },
   {
     number: "02",
-    icon: "⚙️",
-    title: "Automate",
-    headline: "Eliminate manual compliance work",
-    body: "From manifest reconciliation to regulatory filings, WasteWatcher automates the entire compliance lifecycle. What used to take weeks of analyst time now happens overnight — with full audit trails attached.",
-    stat: "1.2M+",
-    statLabel: "claims auto-compiled",
+    icon: "🚚",
+    title: "Reroute",
+    headline: "Recover value from compromised inventory",
+    body: "When shelf life degrades in transit, dynamic rerouting and markdown automation can reduce spoilage costs by 38% and recover 60% to 80% of write-off value.",
+    stat: "38%",
+    statLabel: "average spoilage-cost reduction",
+    citation: 33,
   },
   {
     number: "03",
-    icon: "💡",
-    title: "Empower",
-    headline: "Turn data into financial value",
-    body: "Every ton diverted and every claim filed is a financial event. WasteWatcher surfaces tax write-off opportunities, fee avoidance savings, and ESG reporting metrics so sustainability becomes a board-level story.",
-    stat: "$22M+",
-    statLabel: "write-offs unlocked",
+    icon: "🌍",
+    title: "Decarbonize",
+    headline: "Prevent methane and protect margins",
+    body: "Food waste drives 58% of fugitive landfill methane in U.S. MSW systems. Cutting temperature-linked loss reduces emissions while unlocking billions in recoverable inventory value.",
+    stat: "58%",
+    statLabel: "of fugitive methane from food waste",
+    citation: 16,
   },
 ];
 
 const ROADMAP = [
   {
-    year: "2019",
-    milestone: "Founded",
+    year: "Baseline",
+    milestone: "Current loss profile",
     description:
-      "WasteWatcher incorporated with a focus on mid-market logistics operators.",
+      "U.S. retailers discard roughly 16 billion pounds of product each year due to temperature mismanagement in transport and storage.",
   },
   {
-    year: "2020",
-    milestone: "Series A",
+    year: "Detection",
+    milestone: "Close the visibility gap",
     description:
-      "Raised $8M to scale the compliance engine and expand to the manufacturing sector.",
+      "Replace passive logging with real-time telemetry that detects failures early enough for operational response.",
   },
   {
-    year: "2021",
-    milestone: "100 clients",
+    year: "Action",
+    milestone: "Automate recovery decisions",
     description:
-      "Crossed the 100-enterprise milestone and launched multi-jurisdiction filing support.",
+      "Use FEFO routing, markdown workflows, and secondary-market transfers to salvage inventory at risk.",
   },
   {
-    year: "2022",
-    milestone: "ESG Dashboard",
+    year: "Scale",
+    milestone: "Deploy across 500,000 reefers",
     description:
-      "Shipped the board-ready ESG reporting module and integrations with SAP and Oracle.",
+      "Nationwide deployment is projected at $535.5M to $667M across three years with upper-bound annual SaaS spend of $198M.",
   },
   {
-    year: "2023",
-    milestone: "Series B",
+    year: "Outcome",
+    milestone: "Realize economic and climate returns",
     description:
-      "Raised $31M. Expanded to 18 countries. Launched the AI-powered diversion recommendation engine.",
+      "The model projects $15.2B in annual inventory recovery, ~$76.77 returned per $1 of annual tracking spend, and 13.3M MTCO2e avoided each year at scale.",
+  },
+];
+
+const SOURCES = [
+  {
+    id: 3,
+    title:
+      "Cold Chain Logistics Shipping Guide: Protect Product & Margin | Worldwide Express",
+    href: "https://www.wwex.com/shipping-resources/cold-chain-logistics",
   },
   {
-    year: "2025",
-    milestone: "340+ clients",
-    description:
-      "Serving Fortune 500s across logistics, manufacturing, retail, and healthcare.",
+    id: 4,
+    title: "Food Safety Information | NRM, Inc.",
+    href: "https://www.nrminc.com/resources/food-safety-rules-regulations-nrm/",
+  },
+  {
+    id: 16,
+    title: "Quantifying Methane Emissions from Landfilled Food Waste | US EPA",
+    href: "https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste",
+  },
+  {
+    id: 33,
+    title:
+      "(PDF) Smart Shelf Life: How IoT Sensors Cut Food Waste by 38% While Boosting Perishable Profits",
+    href: "https://www.researchgate.net/publication/396736476_Smart_Shelf_Life_How_IoT_Sensors_Cut_Food_Waste_by_38_While_Boosting_Perishable_Profits",
+  },
+  {
+    id: 34,
+    title: "Three Ways AI Is Driving Reductions in Food Loss and Waste - ReFED",
+    href: "https://refed.org/articles/three-ways-ai-is-driving-reductions-in-food-loss-and-waste/",
+  },
+  {
+    id: 45,
+    title:
+      "Samsara Review: Fleet Management Features, Fees, Support 2026 - Tech.co",
+    href: "https://tech.co/fleet-management/samsara-fleet-management-review",
+  },
+  {
+    id: 50,
+    title: "A ROADMAP TO REDUCE U.S. FOOD WASTE BY 20 PERCENT - ReFED",
+    href: "https://refed.org/downloads/Key_Insights.pdf",
   },
 ];
 
@@ -87,15 +126,17 @@ export default function MissionPage() {
             Why we exist
           </span>
           <h1 className="mx-auto mt-6 max-w-3xl text-5xl font-extrabold leading-tight tracking-tight text-zinc-900 dark:text-zinc-50 md:text-6xl">
-            A world where no enterprise{" "}
+            Build a cold chain where no shipment is{" "}
             <span className="text-emerald-600 dark:text-emerald-400">
-              wastes what it could recover
+              wasted by avoidable temperature loss
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
-            The circular economy isn&apos;t a dream — it&apos;s an engineering
-            problem. WasteWatcher exists to make the infrastructure layer that
-            turns compliance obligations into business advantage.
+            Our mission is to convert reactive cold-chain operations into
+            real-time, recovery-first systems that cut spoilage, methane, and
+            write-offs at the same time
+            <Cite id={33} />
+            <Cite id={16} />.
           </p>
         </div>
       </section>
@@ -112,7 +153,10 @@ export default function MissionPage() {
         </div>
         <div className="flex flex-col gap-8">
           {PILLARS.map(
-            ({ number, icon, title, headline, body, stat, statLabel }, idx) => (
+            (
+              { number, icon, title, headline, body, stat, statLabel, citation },
+              idx
+            ) => (
               <div
                 key={title}
                 className={`flex flex-col gap-8 rounded-2xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 md:flex-row ${
@@ -131,6 +175,7 @@ export default function MissionPage() {
                   </h3>
                   <p className="leading-relaxed text-zinc-500 dark:text-zinc-400">
                     {body}
+                    <Cite id={citation} />
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center rounded-xl bg-emerald-50 px-12 py-10 text-center dark:bg-emerald-900/20 md:min-w-[200px]">
@@ -188,6 +233,19 @@ export default function MissionPage() {
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
                       {description}
+                      {year === "Baseline" && <Cite id={3} />}
+                      {year === "Scale" && (
+                        <>
+                          <Cite id={45} />
+                        </>
+                      )}
+                      {year === "Outcome" && (
+                        <>
+                          <Cite id={33} />
+                          <Cite id={34} />
+                          <Cite id={50} />
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -202,11 +260,11 @@ export default function MissionPage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 py-16 text-center md:flex-row md:text-left">
           <div>
             <h2 className="text-2xl font-bold text-white">
-              Align your operations with our mission
+              Align your cold chain with this mission
             </h2>
             <p className="mt-2 text-emerald-100">
-              See how WasteWatcher can help your organisation hit its
-              sustainability targets.
+              See how your operation can prioritize FEFO recovery and measurable
+              ROI.
             </p>
           </div>
           <Link
@@ -217,6 +275,8 @@ export default function MissionPage() {
           </Link>
         </div>
       </section>
+
+      <Footnotes entries={SOURCES} />
     </>
   );
 }
