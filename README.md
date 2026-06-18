@@ -1,3 +1,5 @@
+This repository represents our 3-day hackathon prototype. Active commercial development has moved to a private repository.
+
 # 🌱 WasteWatchers
 
 **Real-time cold-chain monitoring and salvage rerouting for agricultural logistics**
