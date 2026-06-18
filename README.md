@@ -1,4 +1,4 @@
-This repository represents our 3-day hackathon prototype. Active commercial development has moved to a private repository.
+**Notice:** This repository represents our 3 day hackathon prototype. Active commercial development, proprietary predictive models, and core backend logic have been transitioned to a private repository.
 
 # 🌱 WasteWatchers
 
